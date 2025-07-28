@@ -1,0 +1,3 @@
+extractor,total_samples,success_rate,overall,table_extraction,formula_extraction
+extractor_a,2,1.0,0.0,0.25,1.0
+extractor_b,2,1.0,0.0,0.25,1.0

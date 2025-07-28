@@ -1,0 +1,152 @@
+{
+  "metadata": {
+    "dataset_name": "sample_dataset",
+    "extractor_name": "mock",
+    "timestamp": "2025-07-28T17:50:56.226684",
+    "total_samples": 2
+  },
+  "overall_metrics": {
+    "edit_distance": 0.0,
+    "table_extraction": 0.5,
+    "formula_extraction": 1.0,
+    "overall": 0.0
+  },
+  "sample_results": [
+    {
+      "sample_id": "sample_001",
+      "extraction_success": true,
+      "extraction_time": 5.0067901611328125e-06,
+      "metrics": {
+        "edit_distance": {
+          "score": 0.0,
+          "success": true,
+          "details": {
+            "distance": 17,
+            "predicted_length": 17,
+            "groundtruth_length": 0,
+            "normalized": true
+          }
+        },
+        "table_extraction": {
+          "score": 0.5,
+          "success": true,
+          "details": {
+            "structure_score": 1.0,
+            "content_score": 0.0,
+            "structure_weight": 0.5,
+            "content_weight": 0.5,
+            "predicted_structure": {
+              "rows": 0,
+              "cols": 0
+            },
+            "groundtruth_structure": {
+              "rows": 0,
+              "cols": 0
+            },
+            "algorithm": "simple"
+          }
+        },
+        "formula_extraction": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "syntax_score": 1.0,
+            "semantic_score": 1.0,
+            "predicted_formulas": [],
+            "groundtruth_formulas": [],
+            "num_predicted": 0,
+            "num_groundtruth": 0
+          }
+        },
+        "overall": {
+          "score": 0.0,
+          "success": true,
+          "details": {
+            "source": "edit_distance",
+            "description": "Overall score based on edit distance"
+          }
+        }
+      },
+      "sample_metadata": {
+        "url": "https://example.com/article1",
+        "domain": "example.com",
+        "language": "zh",
+        "content_type": "article",
+        "difficulty": null
+      }
+    },
+    {
+      "sample_id": "sample_002",
+      "extraction_success": true,
+      "extraction_time": 1.9073486328125e-06,
+      "metrics": {
+        "edit_distance": {
+          "score": 0.0,
+          "success": true,
+          "details": {
+            "distance": 17,
+            "predicted_length": 17,
+            "groundtruth_length": 0,
+            "normalized": true
+          }
+        },
+        "table_extraction": {
+          "score": 0.5,
+          "success": true,
+          "details": {
+            "structure_score": 1.0,
+            "content_score": 0.0,
+            "structure_weight": 0.5,
+            "content_weight": 0.5,
+            "predicted_structure": {
+              "rows": 0,
+              "cols": 0
+            },
+            "groundtruth_structure": {
+              "rows": 0,
+              "cols": 0
+            },
+            "algorithm": "simple"
+          }
+        },
+        "formula_extraction": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "syntax_score": 1.0,
+            "semantic_score": 1.0,
+            "predicted_formulas": [],
+            "groundtruth_formulas": [],
+            "num_predicted": 0,
+            "num_groundtruth": 0
+          }
+        },
+        "overall": {
+          "score": 0.0,
+          "success": true,
+          "details": {
+            "source": "edit_distance",
+            "description": "Overall score based on edit distance"
+          }
+        }
+      },
+      "sample_metadata": {
+        "url": "https://news.example.com/news1",
+        "domain": "news.example.com",
+        "language": "zh",
+        "content_type": "news",
+        "difficulty": null
+      }
+    }
+  ],
+  "category_metrics": null,
+  "error_analysis": {
+    "total_samples": 2,
+    "failed_count": 0,
+    "success_rate": 1.0,
+    "common_errors": {},
+    "sample_errors": []
+  },
+  "extractor_config": {},
+  "metric_config": {}
+}
