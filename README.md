@@ -85,40 +85,34 @@ print(f"Overall Score: {result.overall_metrics['overall']:.4f}")
 
 ```jsonl
 {
-  "id": "sample_001",
-  "html": "<html>...</html>",  // 带有 cc-select="true" 标注的 HTML
-  "content": "正文 markdown 内容",  // groundtruth 正文
-  "content_list": [...],  // groundtruth 结构化内容列表
-  "url": "https://example.com",
-  "domain": "example.com",
-  "language": "zh",
-  "content_type": "article"
+  "track_id": "0b7f2636-d35f-40bf-9b7f-94be4bcbb396",
+  "html": "<html><body><h1 cc-select="true">这是标题</h1></body></html>",   # 人工标注带cc-select="true" 属性
+  "groundtruth_content": "# 标题\n\n正文内容",
+  "groundtruth_content_list": [
+      {"type": "heading", "content": "标题", "level": 1},
+      {"type": "paragraph", "content": "正文内容"}
+   ],
+  "url": "https://orderyourbooks.com/product-category/college-books-p-u/?products-per-page=all",
+  "layout_id": "orderyourbooks.com_4",
+  "max_layer_n": 10,
+  "url_host_name": "orderyourbooks.com",
+  "raw_warc_path": "s3://cc-raw-huawei/crawl-data/CC-MAIN-2025-13/segments/1742004433093.21/warc/CC-MAIN-20250319080618-20250319110618-00909.warc.gz?bytes=461610805,172252",
+  "language": "en",
+  "__dom_depth": 19,
+  "__dom_width": 10231,
+  "__type": "__max_depth",
+  "__tag": "DOM_WIDTH",
+  "marked_type": "unwanted",  # normal：正常标注的网页；unable：正文内容无法抉择；unwanted：无需标注的网页；
+  "unwanted_reason": "list"
 }
 ```
 
 ## 支持的抽取器
 
 - **LLM-WebKit**: 基于大语言模型的智能抽取
-- **Unstructured**: 通用文档解析工具
 - **Jina AI**: Reader API 服务
 - **自定义抽取器**: 通过继承 `BaseExtractor` 实现
 
-## 评测指标详解
-
-### 文本指标
-- **编辑距离**: 字符级别的编辑距离，衡量文本差异
-- **BLEU**: 机器翻译质量评估指标，适用于文本生成任务
-- **ROUGE**: 自动摘要评估指标，关注召回率
-
-### 结构指标
-- **层次相似度**: 评估标题、段落等层次结构的保持程度
-- **顺序相似度**: 评估内容顺序的正确性
-- **完整性**: 评估内容抽取的完整程度
-
-### 专项指标
-- **表格抽取**: 表格结构和内容的准确性
-- **公式抽取**: 数学公式的识别和保持
-- **多媒体处理**: 图片、视频等多媒体内容的处理
 
 ## 高级功能
 
@@ -202,17 +196,7 @@ webmainbench/
     └── helpers.py          # 辅助函数
 ```
 
-## 贡献指南
-
-欢迎贡献代码！请查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详细信息。
 
 ## 许可证
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
-## 致谢
-
-感谢以下项目的灵感和支持：
-- [OmniDocBench](https://github.com/opendatalab/OmniDocBench) - 多模态文档理解基准
-- LLM-WebKit - 智能网页内容抽取工具
-- Unstructured - 通用文档解析工具 
