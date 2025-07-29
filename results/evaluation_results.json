@@ -2,7 +2,7 @@
   "metadata": {
     "dataset_name": "sample_dataset",
     "extractor_name": "mock",
-    "timestamp": "2025-07-28T17:50:56.226684",
+    "timestamp": "2025-07-29T11:28:12.489594",
     "total_samples": 2
   },
   "overall_metrics": {
@@ -13,7 +13,7 @@
   },
   "sample_results": [
     {
-      "sample_id": "sample_001",
+      "sample_id": "0b7f2636-d35f-40bf-9b7f-94be4bcbb396",
       "extraction_success": true,
       "extraction_time": 5.0067901611328125e-06,
       "metrics": {
@@ -68,17 +68,17 @@
         }
       },
       "sample_metadata": {
-        "url": "https://example.com/article1",
-        "domain": "example.com",
-        "language": "zh",
-        "content_type": "article",
+        "url": "https://orderyourbooks.com/product-category/college-books-p-u/?products-per-page=all",
+        "domain": null,
+        "language": "en",
+        "content_type": null,
         "difficulty": null
       }
     },
     {
-      "sample_id": "sample_002",
+      "sample_id": "0b7f2636-d35f-40bf-9b7f-94be4bcbb396",
       "extraction_success": true,
-      "extraction_time": 1.9073486328125e-06,
+      "extraction_time": 2.1457672119140625e-06,
       "metrics": {
         "edit_distance": {
           "score": 0.0,
@@ -131,10 +131,10 @@
         }
       },
       "sample_metadata": {
-        "url": "https://news.example.com/news1",
-        "domain": "news.example.com",
-        "language": "zh",
-        "content_type": "news",
+        "url": "https://orderyourbooks.com/product-category/college-books-p-u/?products-per-page=all",
+        "domain": null,
+        "language": "en",
+        "content_type": null,
         "difficulty": null
       }
     }

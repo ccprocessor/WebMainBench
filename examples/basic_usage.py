@@ -20,48 +20,47 @@ def create_sample_dataset():
     # 创建示例数据
     samples = [
         {
-            "id": "sample_001",
-            "html": """<html><body>
-                <h1 cc-select="true">这是标题</h1>
-                <p cc-select="true">这是第一段正文内容。包含了重要信息。</p>
-                <div>
-                    <p cc-select="true">这是第二段正文内容。</p>
-                    <span>这是不相关的内容</span>
-                </div>
-                <footer>页脚信息</footer>
-                </body></html>""",
-            "groundtruth_content": "# 这是标题\n\n这是第一段正文内容。包含了重要信息。\n\n这是第二段正文内容。",
+            "track_id": "0b7f2636-d35f-40bf-9b7f-94be4bcbb396",
+            "html": "<html><body><h1 cc-select=\"true\">这是标题</h1></body></html>",   # 人工标注带cc-select="true" 属性
+            "groundtruth_content": "# 标题\n\n正文内容",
             "groundtruth_content_list": [
-                {"type": "heading", "content": "这是标题", "level": 1},
-                {"type": "paragraph", "content": "这是第一段正文内容。包含了重要信息。"},
-                {"type": "paragraph", "content": "这是第二段正文内容。"}
+                {"type": "heading", "content": "标题", "level": 1},
+                {"type": "paragraph", "content": "正文内容"}
             ],
-            "url": "https://example.com/article1",
-            "domain": "example.com",
-            "language": "zh",
-            "content_type": "article"
+            "url": "https://orderyourbooks.com/product-category/college-books-p-u/?products-per-page=all",
+            "layout_id": "orderyourbooks.com_4",
+            "max_layer_n": 10,
+            "url_host_name": "orderyourbooks.com",
+            "raw_warc_path": "s3://cc-raw-huawei/crawl-data/CC-MAIN-2025-13/segments/1742004433093.21/warc/CC-MAIN-20250319080618-20250319110618-00909.warc.gz?bytes=461610805,172252",
+            "language": "en",
+            "__dom_depth": 19,
+            "__dom_width": 10231,
+            "__type": "__max_depth",
+            "__tag": "DOM_WIDTH",
+            "marked_type": "unwanted",  # normal：正常标注的网页；unable：正文内容无法抉择；unwanted：无需标注的网页；
+            "unwanted_reason": "list"
         },
         {
-            "id": "sample_002", 
-            "html": """<html><body>
-                <h2 cc-select="true">新闻标题</h2>
-                <p cc-select="true">新闻正文第一段。</p>
-                <table cc-select="true">
-                    <tr><th>列1</th><th>列2</th></tr>
-                    <tr><td>数据1</td><td>数据2</td></tr>
-                </table>
-                </body></html>""",
-            "groundtruth_content": "## 新闻标题\n\n新闻正文第一段。\n\n| 列1 | 列2 |\n|-----|-----|\n| 数据1 | 数据2 |",
+            "track_id": "0b7f2636-d35f-40bf-9b7f-94be4bcbb396",
+            "html": "<html><body><h1 cc-select=\"true\">这是标题</h1></body></html>",   # 人工标注带cc-select="true" 属性
+            "groundtruth_content": "# 标题\n\n正文内容",
             "groundtruth_content_list": [
-                {"type": "heading", "content": "新闻标题", "level": 2},
-                {"type": "paragraph", "content": "新闻正文第一段。"},
-                {"type": "table", "content": "| 列1 | 列2 |\n|-----|-----|\n| 数据1 | 数据2 |"}
+                {"type": "heading", "content": "标题", "level": 1},
+                {"type": "paragraph", "content": "正文内容"}
             ],
-            "url": "https://news.example.com/news1",
-            "domain": "news.example.com", 
-            "language": "zh",
-            "content_type": "news"
-        }
+            "url": "https://orderyourbooks.com/product-category/college-books-p-u/?products-per-page=all",
+            "layout_id": "orderyourbooks.com_4",
+            "max_layer_n": 10,
+            "url_host_name": "orderyourbooks.com",
+            "raw_warc_path": "s3://cc-raw-huawei/crawl-data/CC-MAIN-2025-13/segments/1742004433093.21/warc/CC-MAIN-20250319080618-20250319110618-00909.warc.gz?bytes=461610805,172252",
+            "language": "en",
+            "__dom_depth": 19,
+            "__dom_width": 10231,
+            "__type": "__max_depth",
+            "__tag": "DOM_WIDTH",
+            "marked_type": "unwanted",  # normal：正常标注的网页；unable：正文内容无法抉择；unwanted：无需标注的网页；
+            "unwanted_reason": "list"
+        },
     ]
     
     # 创建数据集
@@ -245,7 +244,7 @@ def demo_extractor_comparison():
 if __name__ == "__main__":
     try:
         demo_basic_evaluation()
-        demo_extractor_comparison()
+        # demo_extractor_comparison()
         print("\n✅ 示例运行完成！")
         
     except Exception as e:

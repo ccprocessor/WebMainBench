@@ -48,8 +48,30 @@ class DataSample:
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "DataSample":
-        """Create from dictionary."""
-        return cls(**data)
+        """Create from dictionary, ignoring unknown fields and supporting field mapping."""
+        # 获取类的所有字段名
+        import dataclasses
+        field_names = {f.name for f in dataclasses.fields(cls)}
+        
+        # 定义字段名映射（外部字段名 -> 内部字段名）
+        field_mapping = {
+            "track_id": "id",  # track_id 映射到 id
+            "content": "groundtruth_content",  # content 映射到 groundtruth_content
+            "content_list": "groundtruth_content_list",  # content_list 映射到 groundtruth_content_list
+        }
+        
+        # 只提取定义的字段，忽略其他字段
+        filtered_data = {}
+        for key, value in data.items():
+            # 首先检查是否需要字段映射
+            mapped_key = field_mapping.get(key, key)
+            
+            # 如果映射后的字段名在类字段中，则添加
+            if mapped_key in field_names:
+                filtered_data[mapped_key] = value
+            # 忽略未定义的字段，如 layout_id、max_layer_n 等
+        
+        return cls(**filtered_data)
 
 
 class BenchmarkDataset:

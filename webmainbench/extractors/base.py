@@ -15,7 +15,8 @@ class ExtractionResult:
     
     # Core extraction results
     content: str = ""  # Extracted markdown content
-    content_list: List[Dict[str, Any]] = None  # Structured content list
+    content_list: Optional[List[Dict[str, Any]]] = None  # Structured content list
+    version: str = None  # Version of the extractor
     
     # Metadata
     success: bool = True
