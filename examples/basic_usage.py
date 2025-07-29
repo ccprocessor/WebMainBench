@@ -17,50 +17,267 @@ from webmainbench import (
 def create_sample_dataset():
     """创建示例数据集"""
     
-    # 创建示例数据
+    # 创建示例数据 - 包含多种内容类型（代码、公式、表格等）
     samples = [
         {
-            "track_id": "0b7f2636-d35f-40bf-9b7f-94be4bcbb396",
-            "html": "<html><body><h1 cc-select=\"true\">这是标题</h1></body></html>",   # 人工标注带cc-select="true" 属性
-            "groundtruth_content": "# 标题\n\n正文内容",
+            "track_id": "sample-001-programming-tutorial",
+            "html": '''<html><body>
+                <h1 cc-select="true">Python编程教程</h1>
+                <p cc-select="true">这是一个Python基础教程，展示如何定义函数。</p>
+                <pre cc-select="true"><code>def greet(name):
+    """问候函数"""
+    return f"Hello, {name}!"
+
+# 使用示例
+result = greet("World")
+print(result)</code></pre>
+                <p cc-select="true">这个函数可以用来问候任何人。</p>
+            </body></html>''',
+            "groundtruth_content": '''# Python编程教程
+
+这是一个Python基础教程，展示如何定义函数。
+
+```python
+def greet(name):
+    """问候函数"""
+    return f"Hello, {name}!"
+
+# 使用示例
+result = greet("World")
+print(result)
+```
+
+这个函数可以用来问候任何人。''',
             "groundtruth_content_list": [
-                {"type": "heading", "content": "标题", "level": 1},
-                {"type": "paragraph", "content": "正文内容"}
+                {"type": "heading", "content": "Python编程教程", "level": 1},
+                {"type": "paragraph", "content": "这是一个Python基础教程，展示如何定义函数。"},
+                {"type": "code", "content": 'def greet(name):\n    """问候函数"""\n    return f"Hello, {name}!"\n\n# 使用示例\nresult = greet("World")\nprint(result)'},
+                {"type": "paragraph", "content": "这个函数可以用来问候任何人。"}
             ],
-            "url": "https://orderyourbooks.com/product-category/college-books-p-u/?products-per-page=all",
-            "layout_id": "orderyourbooks.com_4",
-            "max_layer_n": 10,
-            "url_host_name": "orderyourbooks.com",
-            "raw_warc_path": "s3://cc-raw-huawei/crawl-data/CC-MAIN-2025-13/segments/1742004433093.21/warc/CC-MAIN-20250319080618-20250319110618-00909.warc.gz?bytes=461610805,172252",
+            "url": "https://python-tutorial.example.com/functions",
+            "layout_id": "python-tutorial_1",
+            "max_layer_n": 8,
+            "url_host_name": "python-tutorial.example.com",
+            "raw_warc_path": "s3://cc-raw-tutorials/crawl-data/CC-MAIN-2025-13/segments/1742004433093.21/warc/tutorial-001.warc.gz",
             "language": "en",
-            "__dom_depth": 19,
-            "__dom_width": 10231,
-            "__type": "__max_depth",
-            "__tag": "DOM_WIDTH",
-            "marked_type": "unwanted",  # normal：正常标注的网页；unable：正文内容无法抉择；unwanted：无需标注的网页；
-            "unwanted_reason": "list"
+            "__dom_depth": 12,
+            "__dom_width": 5240,
+            "__type": "__programming_tutorial",
+            "__tag": "CODE_CONTENT",
+            "marked_type": "normal",
+            "content_type": "programming"
         },
         {
-            "track_id": "0b7f2636-d35f-40bf-9b7f-94be4bcbb396",
-            "html": "<html><body><h1 cc-select=\"true\">这是标题</h1></body></html>",   # 人工标注带cc-select="true" 属性
-            "groundtruth_content": "# 标题\n\n正文内容",
+            "track_id": "sample-002-math-formulas",
+            "html": '''<html><body>
+                <h1 cc-select="true">数学公式示例</h1>
+                <p cc-select="true">这里展示一些基本的数学公式。</p>
+                <p cc-select="true">勾股定理：a² + b² = c²</p>
+                <div cc-select="true" class="formula">
+                    <p>二次方程的解为：</p>
+                    <p>x = (-b ± √(b² - 4ac)) / 2a</p>
+                </div>
+                <p cc-select="true">欧拉公式是数学中最美丽的公式之一：e^(iπ) + 1 = 0</p>
+                <table cc-select="true">
+                    <tr><th>函数</th><th>导数</th></tr>
+                    <tr><td>x²</td><td>2x</td></tr>
+                    <tr><td>sin(x)</td><td>cos(x)</td></tr>
+                </table>
+            </body></html>''',
+            "groundtruth_content": '''# 数学公式示例
+
+这里展示一些基本的数学公式。
+
+勾股定理：$a^2 + b^2 = c^2$
+
+二次方程的解为：
+
+$$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$
+
+欧拉公式是数学中最美丽的公式之一：$e^{i\\pi} + 1 = 0$
+
+| 函数 | 导数 |
+|------|------|
+| x² | 2x |
+| sin(x) | cos(x) |''',
             "groundtruth_content_list": [
-                {"type": "heading", "content": "标题", "level": 1},
-                {"type": "paragraph", "content": "正文内容"}
+                {"type": "heading", "content": "数学公式示例", "level": 1},
+                {"type": "paragraph", "content": "这里展示一些基本的数学公式。"},
+                {"type": "paragraph", "content": "勾股定理：a² + b² = c²"},
+                {"type": "paragraph", "content": "二次方程的解为："},
+                {"type": "equation-interline", "content": "x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}"},
+                {"type": "paragraph", "content": "欧拉公式是数学中最美丽的公式之一：e^(iπ) + 1 = 0"},
+                {"type": "table", "content": "| 函数 | 导数 |\n|------|------|\n| x² | 2x |\n| sin(x) | cos(x) |"}
             ],
-            "url": "https://orderyourbooks.com/product-category/college-books-p-u/?products-per-page=all",
-            "layout_id": "orderyourbooks.com_4",
+            "url": "https://math-examples.edu/formulas",
+            "layout_id": "math-examples_2",
             "max_layer_n": 10,
-            "url_host_name": "orderyourbooks.com",
-            "raw_warc_path": "s3://cc-raw-huawei/crawl-data/CC-MAIN-2025-13/segments/1742004433093.21/warc/CC-MAIN-20250319080618-20250319110618-00909.warc.gz?bytes=461610805,172252",
-            "language": "en",
-            "__dom_depth": 19,
-            "__dom_width": 10231,
-            "__type": "__max_depth",
-            "__tag": "DOM_WIDTH",
-            "marked_type": "unwanted",  # normal：正常标注的网页；unable：正文内容无法抉择；unwanted：无需标注的网页；
-            "unwanted_reason": "list"
+            "url_host_name": "math-examples.edu",
+            "raw_warc_path": "s3://cc-raw-academic/crawl-data/CC-MAIN-2025-13/segments/1742004433093.21/warc/math-002.warc.gz",
+            "language": "zh",
+            "__dom_depth": 15,
+            "__dom_width": 6850,
+            "__type": "__academic_content",
+            "__tag": "FORMULA_TABLE",
+            "marked_type": "normal",
+            "content_type": "academic"
         },
+        {
+            "track_id": "sample-003-data-analysis",
+            "html": '''<html><body>
+                <h1 cc-select="true">数据分析报告</h1>
+                <p cc-select="true">以下是2024年第一季度的销售数据分析。</p>
+                <h2 cc-select="true">数据处理代码</h2>
+                <pre cc-select="true"><code>import pandas as pd
+import numpy as np
+
+# 读取数据
+df = pd.read_csv('sales_q1_2024.csv')
+
+# 计算统计信息
+monthly_avg = df.groupby('month')['sales'].mean()
+print(f"平均销售额: {monthly_avg}")</code></pre>
+                <h2 cc-select="true">销售统计</h2>
+                <table cc-select="true">
+                    <tr><th>月份</th><th>销售额(万元)</th><th>增长率</th></tr>
+                    <tr><td>1月</td><td>120.5</td><td>+15.2%</td></tr>
+                    <tr><td>2月</td><td>135.8</td><td>+12.7%</td></tr>
+                    <tr><td>3月</td><td>148.3</td><td>+9.2%</td></tr>
+                </table>
+                <p cc-select="true">标准差公式：σ = √(Σ(xi - μ)² / n)</p>
+                <p cc-select="true">总体来看，第一季度销售表现良好，呈现稳定增长趋势。</p>
+            </body></html>''',
+            "groundtruth_content": '''# 数据分析报告
+
+以下是2024年第一季度的销售数据分析。
+
+## 数据处理代码
+
+```python
+import pandas as pd
+import numpy as np
+
+# 读取数据
+df = pd.read_csv('sales_q1_2024.csv')
+
+# 计算统计信息
+monthly_avg = df.groupby('month')['sales'].mean()
+print(f"平均销售额: {monthly_avg}")
+```
+
+## 销售统计
+
+| 月份 | 销售额(万元) | 增长率 |
+|------|-------------|--------|
+| 1月 | 120.5 | +15.2% |
+| 2月 | 135.8 | +12.7% |
+| 3月 | 148.3 | +9.2% |
+
+标准差公式：$\\sigma = \\sqrt{\\frac{\\Sigma(x_i - \\mu)^2}{n}}$
+
+总体来看，第一季度销售表现良好，呈现稳定增长趋势。''',
+            "groundtruth_content_list": [
+                {"type": "heading", "content": "数据分析报告", "level": 1},
+                {"type": "paragraph", "content": "以下是2024年第一季度的销售数据分析。"},
+                {"type": "heading", "content": "数据处理代码", "level": 2},
+                {"type": "code", "content": "import pandas as pd\nimport numpy as np\n\n# 读取数据\ndf = pd.read_csv('sales_q1_2024.csv')\n\n# 计算统计信息\nmonthly_avg = df.groupby('month')['sales'].mean()\nprint(f\"平均销售额: {monthly_avg}\")"},
+                {"type": "heading", "content": "销售统计", "level": 2},
+                {"type": "table", "content": "| 月份 | 销售额(万元) | 增长率 |\n|------|-------------|--------|\n| 1月 | 120.5 | +15.2% |\n| 2月 | 135.8 | +12.7% |\n| 3月 | 148.3 | +9.2% |"},
+                {"type": "paragraph", "content": "标准差公式：σ = √(Σ(xi - μ)² / n)"},
+                {"type": "paragraph", "content": "总体来看，第一季度销售表现良好，呈现稳定增长趋势。"}
+            ],
+            "url": "https://data-report.company.com/q1-2024-analysis",
+            "layout_id": "data-report_3",
+            "max_layer_n": 12,
+            "url_host_name": "data-report.company.com",
+            "raw_warc_path": "s3://cc-raw-business/crawl-data/CC-MAIN-2025-13/segments/1742004433093.21/warc/analysis-003.warc.gz",
+            "language": "zh",
+            "__dom_depth": 18,
+            "__dom_width": 8420,
+            "__type": "__business_report",
+            "__tag": "MIXED_CONTENT",
+            "marked_type": "normal",
+            "content_type": "business"
+        },
+        {
+            "track_id": "sample-004-algorithm-explanation",
+            "html": '''<html><body>
+                <h1 cc-select="true">算法复杂度分析</h1>
+                <p cc-select="true">这里介绍常见算法的时间复杂度。</p>
+                <h2 cc-select="true">快速排序实现</h2>
+                <pre cc-select="true"><code>def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    
+    return quicksort(left) + middle + quicksort(right)</code></pre>
+                <h2 cc-select="true">复杂度对比</h2>
+                <table cc-select="true">
+                    <tr><th>算法</th><th>最好情况</th><th>平均情况</th><th>最坏情况</th></tr>
+                    <tr><td>快速排序</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td></tr>
+                    <tr><td>归并排序</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td></tr>
+                    <tr><td>冒泡排序</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td></tr>
+                </table>
+                <p cc-select="true">Master定理：T(n) = aT(n/b) + f(n)</p>
+                <p cc-select="true">其中 a ≥ 1, b > 1 是常数，f(n) 是正函数。</p>
+            </body></html>''',
+            "groundtruth_content": '''# 算法复杂度分析
+
+这里介绍常见算法的时间复杂度。
+
+## 快速排序实现
+
+```python
+def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    
+    return quicksort(left) + middle + quicksort(right)
+```
+
+## 复杂度对比
+
+| 算法 | 最好情况 | 平均情况 | 最坏情况 |
+|------|----------|----------|----------|
+| 快速排序 | O(n log n) | O(n log n) | O(n²) |
+| 归并排序 | O(n log n) | O(n log n) | O(n log n) |
+| 冒泡排序 | O(n) | O(n²) | O(n²) |
+
+Master定理：$T(n) = aT(n/b) + f(n)$
+
+其中 $a \\geq 1, b > 1$ 是常数，$f(n)$ 是正函数。''',
+            "groundtruth_content_list": [
+                {"type": "heading", "content": "算法复杂度分析", "level": 1},
+                {"type": "paragraph", "content": "这里介绍常见算法的时间复杂度。"},
+                {"type": "heading", "content": "快速排序实现", "level": 2},
+                {"type": "code", "content": "def quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    \n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    \n    return quicksort(left) + middle + quicksort(right)"},
+                {"type": "heading", "content": "复杂度对比", "level": 2},
+                {"type": "table", "content": "| 算法 | 最好情况 | 平均情况 | 最坏情况 |\n|------|----------|----------|----------|\n| 快速排序 | O(n log n) | O(n log n) | O(n²) |\n| 归并排序 | O(n log n) | O(n log n) | O(n log n) |\n| 冒泡排序 | O(n) | O(n²) | O(n²) |"},
+                {"type": "equation-inline", "content": "T(n) = aT(n/b) + f(n)"},
+                {"type": "paragraph", "content": "其中 a ≥ 1, b > 1 是常数，f(n) 是正函数。"}
+            ],
+            "url": "https://algorithm-guide.cs.edu/complexity-analysis",
+            "layout_id": "algorithm-guide_4",
+            "max_layer_n": 14,
+            "url_host_name": "algorithm-guide.cs.edu",
+            "raw_warc_path": "s3://cc-raw-computer-science/crawl-data/CC-MAIN-2025-13/segments/1742004433093.21/warc/algo-004.warc.gz",
+            "language": "zh",
+            "__dom_depth": 16,
+            "__dom_width": 7320,
+            "__type": "__computer_science",
+            "__tag": "ALGORITHM_CONTENT",
+            "marked_type": "normal",
+            "content_type": "computer_science"
+        }
     ]
     
     # 创建数据集

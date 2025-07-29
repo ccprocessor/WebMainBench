@@ -2,7 +2,7 @@
   "metadata": {
     "dataset_name": "sample_dataset",
     "extractor_name": "mock",
-    "timestamp": "2025-07-29T16:46:58.062555",
+    "timestamp": "2025-07-29T19:31:53.042888",
     "total_samples": 2
   },
   "overall_metrics": {
@@ -15,9 +15,9 @@
   },
   "sample_results": [
     {
-      "sample_id": "0b7f2636-d35f-40bf-9b7f-94be4bcbb396",
+      "sample_id": "sample-001-programming-tutorial",
       "extraction_success": true,
-      "extraction_time": 3.0994415283203125e-06,
+      "extraction_time": 3.814697265625e-06,
       "metrics": {
         "code_edit": {
           "score": 1.0,
@@ -75,11 +75,11 @@
           "score": 0.0,
           "success": true,
           "details": {
-            "distance": 14,
-            "predicted_length": 14,
+            "distance": 5,
+            "predicted_length": 5,
             "groundtruth_length": 0,
             "normalized": true,
-            "predicted_text_length": 14,
+            "predicted_text_length": 5,
             "groundtruth_text_length": 0,
             "content_type": "text"
           }
@@ -103,17 +103,17 @@
         }
       },
       "sample_metadata": {
-        "url": "https://orderyourbooks.com/product-category/college-books-p-u/?products-per-page=all",
+        "url": "https://python-tutorial.example.com/functions",
         "domain": null,
         "language": "en",
-        "content_type": null,
+        "content_type": "programming",
         "difficulty": null
       }
     },
     {
-      "sample_id": "0b7f2636-d35f-40bf-9b7f-94be4bcbb396",
+      "sample_id": "sample-002-math-formulas",
       "extraction_success": true,
-      "extraction_time": 9.5367431640625e-07,
+      "extraction_time": 2.1457672119140625e-06,
       "metrics": {
         "code_edit": {
           "score": 1.0,
@@ -171,11 +171,11 @@
           "score": 0.0,
           "success": true,
           "details": {
-            "distance": 14,
-            "predicted_length": 14,
+            "distance": 5,
+            "predicted_length": 5,
             "groundtruth_length": 0,
             "normalized": true,
-            "predicted_text_length": 14,
+            "predicted_text_length": 5,
             "groundtruth_text_length": 0,
             "content_type": "text"
           }
@@ -199,10 +199,10 @@
         }
       },
       "sample_metadata": {
-        "url": "https://orderyourbooks.com/product-category/college-books-p-u/?products-per-page=all",
+        "url": "https://math-examples.edu/formulas",
         "domain": null,
-        "language": "en",
-        "content_type": null,
+        "language": "zh",
+        "content_type": "academic",
         "difficulty": null
       }
     }
