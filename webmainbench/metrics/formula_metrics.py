@@ -3,142 +3,105 @@ Formula extraction metrics for WebMainBench.
 """
 
 from typing import Dict, Any, List
+import re
 from .base import BaseMetric, MetricResult
+from .text_metrics import EditDistanceMetric
 
 
-class FormulaExtractionMetric(BaseMetric):
-    """Metric for evaluating mathematical formula extraction."""
+class FormulaEditMetric(EditDistanceMetric):
+    """公式编辑距离指标（包括行内和行间公式）"""
     
     version = "1.0.0"
-    description = "Mathematical formula extraction evaluation"
+    description = "Formula (inline and block) edit distance metric"
     
-    def _setup(self) -> None:
-        """Setup the formula extraction metric."""
-        self.syntax_weight = self.config.get('syntax_weight', 0.6)
-        self.semantic_weight = self.config.get('semantic_weight', 0.4)
+    def _calculate_score(self, predicted: str, groundtruth: str,
+                        predicted_content_list: List[Dict[str, Any]] = None,
+                        groundtruth_content_list: List[Dict[str, Any]] = None,
+                        **kwargs) -> MetricResult:
+        """计算公式的编辑距离"""
+        
+        # 从content_list中提取公式内容
+        pred_formula = self._extract_formula_content(predicted, predicted_content_list)
+        gt_formula = self._extract_formula_content(groundtruth, groundtruth_content_list)
+        
+        # 计算编辑距离
+        result = super()._calculate_score(pred_formula, gt_formula, **kwargs)
+        result.metric_name = self.name
+        result.details.update({
+            "predicted_formula_length": len(pred_formula),
+            "groundtruth_formula_length": len(gt_formula),
+            "content_type": "formula"
+        })
+        
+        return result
     
-    def _calculate_score(self, predicted: Any, groundtruth: Any, **kwargs) -> MetricResult:
-        """
-        Calculate formula extraction score.
+    def _extract_formula_content(self, text: str, content_list: List[Dict[str, Any]] = None) -> str:
+        """从文本和content_list中提取公式内容"""
+        formula_parts = []
         
-        Args:
-            predicted: Predicted formula (LaTeX, MathML, or text)
-            groundtruth: Ground truth formula
+        # 优先从content_list中递归提取
+        if content_list:
+            formula_parts = self._extract_formulas_from_content_list(content_list)
             
-        Returns:
-            MetricResult with formula extraction score
-        """
-        try:
-            # Extract formulas from the content
-            pred_formulas = self._extract_formulas(predicted)
-            gt_formulas = self._extract_formulas(groundtruth)
+            # 如果content_list中有公式，直接返回
+            if formula_parts:
+                return '\n'.join(formula_parts)
+        
+        # 只有当content_list中没有公式时，才从文本中提取（使用与_extract_formulas一致的逻辑）
+        if text:
+            # 使用增强的公式提取模式
+            latex_patterns = [
+                r'\$\$([^$]+)\$\$',  # Display math
+                r'(?<!\$)\$([^$\n]+)\$(?!\$)',  # Inline math (improved)
+                r'\\begin\{equation\*?\}(.*?)\\end\{equation\*?\}',  # Equation environment
+                r'\\begin\{align\*?\}(.*?)\\end\{align\*?\}',        # Align environment
+                r'\\begin\{gather\*?\}(.*?)\\end\{gather\*?\}',      # Gather environment
+                r'\\begin\{eqnarray\*?\}(.*?)\\end\{eqnarray\*?\}',  # Eqnarray environment
+                r'\\begin\{multline\*?\}(.*?)\\end\{multline\*?\}',  # Multline environment
+                r'\\begin\{split\}(.*?)\\end\{split\}',              # Split environment
+            ]
             
-            # Calculate syntax similarity
-            syntax_score = self._calculate_syntax_similarity(pred_formulas, gt_formulas)
-            
-            # Calculate semantic similarity (placeholder)
-            semantic_score = self._calculate_semantic_similarity(pred_formulas, gt_formulas)
-            
-            # Combine scores
-            final_score = (
-                syntax_score * self.syntax_weight + 
-                semantic_score * self.semantic_weight
-            )
-            
-            details = {
-                "syntax_score": syntax_score,
-                "semantic_score": semantic_score,
-                "predicted_formulas": pred_formulas,
-                "groundtruth_formulas": gt_formulas,
-                "num_predicted": len(pred_formulas),
-                "num_groundtruth": len(gt_formulas),
-            }
-            
-            return MetricResult(
-                metric_name=self.name,
-                score=final_score,
-                details=details
-            )
-            
-        except Exception as e:
-            return MetricResult.create_error_result(
-                self.name, f"Formula evaluation failed: {str(e)}"
-            )
+            for pattern in latex_patterns:
+                matches = re.findall(pattern, text, re.DOTALL)
+                formula_parts.extend(matches)
+        
+        # Clean and filter formulas before joining
+        cleaned_formulas = []
+        for formula in formula_parts:
+            formula = formula.strip()
+            if formula and len(formula) > 1:
+                cleaned_formulas.append(formula)
+        
+        return '\n'.join(cleaned_formulas)
     
-    def _extract_formulas(self, content: Any) -> List[str]:
-        """Extract mathematical formulas from content."""
-        import re
-        
-        if not isinstance(content, str):
-            content = str(content)
-        
+    def _extract_formulas_from_content_list(self, content_list: List[Dict[str, Any]]) -> List[str]:
+        """递归从content_list中提取公式内容"""
         formulas = []
         
-        # Extract LaTeX-style formulas
-        latex_patterns = [
-            r'\$\$([^$]+)\$\$',  # Display math
-            r'\$([^$]+)\$',      # Inline math
-            r'\\begin\{equation\}(.*?)\\end\{equation\}',  # Equation environment
-            r'\\begin\{align\}(.*?)\\end\{align\}',        # Align environment
-        ]
-        
-        for pattern in latex_patterns:
-            matches = re.findall(pattern, content, re.DOTALL)
-            formulas.extend(matches)
-        
-        # Extract MathML formulas
-        mathml_pattern = r'<math[^>]*>(.*?)</math>'
-        mathml_matches = re.findall(mathml_pattern, content, re.DOTALL | re.IGNORECASE)
-        formulas.extend(mathml_matches)
-        
-        return formulas
-    
-    def _calculate_syntax_similarity(self, pred_formulas: List[str], gt_formulas: List[str]) -> float:
-        """Calculate syntax similarity between formula lists."""
-        if not pred_formulas and not gt_formulas:
-            return 1.0
-        
-        if not pred_formulas or not gt_formulas:
-            return 0.0
-        
-        # Simple approach: calculate pairwise similarities and find best matches
-        from difflib import SequenceMatcher
-        
-        total_score = 0.0
-        max_count = max(len(pred_formulas), len(gt_formulas))
-        
-        # Find best matches
-        used_gt = set()
-        for pred_formula in pred_formulas:
-            best_score = 0.0
-            best_idx = -1
+        def _recursive_extract(items):
+            if not isinstance(items, list):
+                return
             
-            for i, gt_formula in enumerate(gt_formulas):
-                if i in used_gt:
+            for item in items:
+                if not isinstance(item, dict):
                     continue
                 
-                score = SequenceMatcher(None, pred_formula, gt_formula).ratio()
-                if score > best_score:
-                    best_score = score
-                    best_idx = i
-            
-            if best_idx >= 0:
-                used_gt.add(best_idx)
-                total_score += best_score
+                # 检查当前项是否为公式
+                item_type = item.get('type', '')
+                if item_type in ['equation-interline', 'equation-inline']:
+                    content = item.get('content', '')
+                    if content:
+                        formulas.append(content)
+                
+                # 递归检查children字段
+                children = item.get('children')
+                if children:
+                    _recursive_extract(children)
+                
+                # 递归检查items字段（有些实现可能使用items）
+                items_field = item.get('items')
+                if items_field:
+                    _recursive_extract(items_field)
         
-        return total_score / max_count
-    
-    def _calculate_semantic_similarity(self, pred_formulas: List[str], gt_formulas: List[str]) -> float:
-        """Calculate semantic similarity between formulas."""
-        # This is a placeholder for semantic similarity
-        # In practice, you might use symbolic math libraries to parse and compare
-        # the mathematical meaning of formulas
-        
-        if not pred_formulas and not gt_formulas:
-            return 1.0
-        
-        if not pred_formulas or not gt_formulas:
-            return 0.0
-        
-        # For now, just return syntax similarity as a proxy
-        return self._calculate_syntax_similarity(pred_formulas, gt_formulas) 
+        _recursive_extract(content_list)
+        return formulas 

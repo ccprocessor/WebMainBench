@@ -21,8 +21,8 @@ def demo_teds_configuration():
     """演示如何配置 TEDS 算法"""
     print("=== 🔧 TEDS 配置示例 ===\n")
     
-    # 方法1: 在 TableExtractionMetric 中启用 TEDS
-    print("**方法1: 在现有表格指标中启用 TEDS**")
+    # 方法1: 使用 TableTEDSMetric 指标
+    print("**方法1: 使用专用的 TableTEDSMetric 指标**")
     evaluation_config = {
         "metrics": {
             "table_extraction": {

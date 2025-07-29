@@ -1,2 +1,2 @@
-extractor,total_samples,success_rate,overall,table_extraction,formula_extraction
-mock,2,1.0,0.0,0.5,1.0
+extractor,total_samples,success_rate,overall
+mock,2,1.0,0.8

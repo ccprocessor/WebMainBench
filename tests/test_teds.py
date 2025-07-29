@@ -13,7 +13,7 @@ project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from webmainbench.metrics.teds_metrics import TEDSMetric, StructureTEDSMetric
-from webmainbench.metrics.table_metrics import TableExtractionMetric
+
 
 
 class TestTEDSBasic(unittest.TestCase):
@@ -182,65 +182,7 @@ class TestStructureTEDS(unittest.TestCase):
         self.assertLess(result.score, 1.0)  # Should detect structural difference
 
 
-class TestTableExtractionMetricIntegration(unittest.TestCase):
-    """Test TEDS integration with TableExtractionMetric - 表格抽取指标集成测试"""
-    
-    def test_teds_integration_with_table_metric(self):
-        """Test TEDS integration with TableExtractionMetric - 测试TEDS集成"""
-        config = {'use_teds': True}
-        table_metric = TableExtractionMetric("table_with_teds", config)
-        
-        table1 = "<table><tr><th>Product</th><th>Price</th></tr><tr><td>Apple</td><td>$1</td></tr></table>"
-        table2 = "<table><tr><th>Product</th><th>Price</th></tr><tr><td>Orange</td><td>$2</td></tr></table>"
-        
-        result = table_metric.calculate(table1, table2)
-        
-        self.assertTrue(result.success)
-        self.assertEqual(result.details.get('algorithm'), 'TEDS')
-        self.assertGreater(result.score, 0.0)
-        self.assertLess(result.score, 1.0)
-        
-    def test_table_metric_with_teds(self):
-        """Test TableExtractionMetric using TEDS algorithm - 测试使用TEDS算法"""
-        config = {'use_teds': True}
-        metric = TableExtractionMetric("table_teds", config)
-        
-        table1 = """
-        <table>
-            <tr><th>Name</th><th>Age</th></tr>
-            <tr><td>John</td><td>25</td></tr>
-        </table>
-        """
-        
-        table2 = """
-        <table>
-            <tr><th>Name</th><th>Age</th></tr>
-            <tr><td>Jane</td><td>30</td></tr>
-        </table>
-        """
-        
-        result = metric.calculate(table1, table2)
-        self.assertTrue(result.success)
-        self.assertEqual(result.details.get('algorithm'), 'TEDS')
-        
-    def test_table_metric_simple_vs_teds(self):
-        """Compare simple algorithm vs TEDS - 比较简单算法与TEDS"""
-        simple_config = {'use_teds': False}
-        teds_config = {'use_teds': True}
-        
-        simple_metric = TableExtractionMetric("table_simple", simple_config)
-        teds_metric = TableExtractionMetric("table_teds", teds_config)
-        
-        table1 = "<table><tr><td>A</td><td>B</td></tr></table>"
-        table2 = "<table><tr><td>A</td><td>C</td></tr></table>"
-        
-        simple_result = simple_metric.calculate(table1, table2)
-        teds_result = teds_metric.calculate(table1, table2)
-        
-        self.assertTrue(simple_result.success)
-        self.assertTrue(teds_result.success)
-        self.assertEqual(simple_result.details.get('algorithm'), 'simple')
-        self.assertEqual(teds_result.details.get('algorithm'), 'TEDS')
+
 
 
 class TestTEDSEdgeCases(unittest.TestCase):
@@ -295,7 +237,6 @@ def run_all_teds_tests():
         TestTEDSBasic,
         TestTEDSAdvanced,
         TestStructureTEDS,
-        TestTableExtractionMetricIntegration,
         TestTEDSEdgeCases
     ]
     

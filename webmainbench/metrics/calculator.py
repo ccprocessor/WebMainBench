@@ -4,10 +4,9 @@ Metric calculator for WebMainBench.
 
 from typing import Dict, Any, List, Optional, Union
 from .base import BaseMetric, MetricResult
-from .text_metrics import EditDistanceMetric, BLEUMetric, ROUGEMetric
-from .table_metrics import TableExtractionMetric
-from .formula_metrics import FormulaExtractionMetric
-from .structure_metrics import StructureMetric
+from .text_metrics import EditDistanceMetric, BLEUMetric, ROUGEMetric, CodeEditMetric, TextEditMetric
+from .table_metrics import TableEditMetric, TableTEDSMetric
+from .formula_metrics import FormulaEditMetric
 
 
 class MetricCalculator:
@@ -26,16 +25,12 @@ class MetricCalculator:
     
     def _setup_default_metrics(self) -> None:
         """Setup default metrics."""
-        # Core metrics only
-        self.add_metric("edit_distance", EditDistanceMetric("edit_distance"))
-        self.add_metric("table_extraction", TableExtractionMetric("table_extraction"))
-        self.add_metric("formula_extraction", FormulaExtractionMetric("formula_extraction"))
-        
-        # Keep BLEU implementation but don't add to default metrics
-        # try:
-        #     self.add_metric("bleu", BLEUMetric("bleu"))
-        # except RuntimeError:
-        #     pass
+        # 注册新的内容类型指标
+        self.add_metric("code_edit", CodeEditMetric("code_edit"))
+        self.add_metric("formula_edit", FormulaEditMetric("formula_edit"))
+        self.add_metric("table_edit", TableEditMetric("table_edit"))
+        self.add_metric("table_TEDS", TableTEDSMetric("table_TEDS"))
+        self.add_metric("text_edit", TextEditMetric("text_edit"))
     
     def add_metric(self, name: str, metric: BaseMetric) -> None:
         """
@@ -82,17 +77,16 @@ class MetricCalculator:
                 if metric_name in ["edit_distance", "bleu", "rouge"]:
                     # Text-based metrics
                     result = metric.calculate(predicted_content, groundtruth_content, **kwargs)
-                
-                elif metric_name == "structure":
-                    # Structure metric uses content_list
-                    pred_list = predicted_content_list or []
-                    gt_list = groundtruth_content_list or []
-                    result = metric.calculate(pred_list, gt_list, **kwargs)
-                
-                elif metric_name in ["table_extraction", "formula_extraction"]:
-                    # Content-specific metrics
-                    result = metric.calculate(predicted_content, groundtruth_content, **kwargs)
-                
+                elif metric_name in ["code_edit", "formula_edit", 
+                                   "table_edit", "table_TEDS", "text_edit"]:
+                    # 新的内容类型指标，需要传递 content_list
+                    result = metric.calculate(
+                        predicted_content, 
+                        groundtruth_content,
+                        predicted_content_list=predicted_content_list,
+                        groundtruth_content_list=groundtruth_content_list,
+                        **kwargs
+                    )
                 else:
                     # Generic calculation
                     result = metric.calculate(predicted_content, groundtruth_content, **kwargs)
@@ -105,12 +99,34 @@ class MetricCalculator:
                     metric_name, f"Metric calculation failed: {str(e)}"
                 )
         
-        # Add overall score as edit_distance
-        if "edit_distance" in results and results["edit_distance"].success:
+        # Add overall score as average of all metrics
+        successful_scores = []
+        failed_metrics = []
+        
+        for metric_name, result in results.items():
+            if result.success:
+                successful_scores.append(result.score)
+            else:
+                failed_metrics.append(metric_name)
+        
+        if successful_scores:
+            overall_score = sum(successful_scores) / len(successful_scores)
             overall_result = MetricResult(
                 metric_name="overall",
-                score=results["edit_distance"].score,
-                details={"source": "edit_distance", "description": "Overall score based on edit distance"}
+                score=overall_score,
+                details={
+                    "source": "average_of_all_metrics", 
+                    "description": "Overall score as average of all successful metrics",
+                    "successful_metrics": len(successful_scores),
+                    "failed_metrics": len(failed_metrics),
+                    "individual_scores": {name: result.score for name, result in results.items() if result.success}
+                }
+            )
+            results["overall"] = overall_result
+        else:
+            # 如果所有指标都失败了，overall分数为0
+            overall_result = MetricResult.create_error_result(
+                "overall", "All individual metrics failed"
             )
             results["overall"] = overall_result
         

@@ -250,11 +250,8 @@ class Evaluator:
             else:
                 aggregated_metrics[metric_name] = 0.0
         
-        # Calculate overall score as edit_distance
-        if 'edit_distance' in aggregated_metrics:
-            aggregated_metrics['overall'] = aggregated_metrics['edit_distance']
-        else:
-            aggregated_metrics['overall'] = 0.0
+        # overall score is already calculated by MetricCalculator
+        # No need to override it here
         
         return aggregated_metrics
     
