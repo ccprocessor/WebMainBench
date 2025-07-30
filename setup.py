@@ -35,12 +35,20 @@ setup(
         "lxml>=4.9.0",
         "jsonlines>=3.1.0",
         "requests>=2.28.0",
+        "beautifulsoup4==4.12.0",
+        "numpy>=1.21.0,<2.0.0",  # 避免NumPy 2.x兼容性问题
     ],
     extras_require={
         "all": [
             "nltk>=3.8",
             "rouge-score>=0.1.2",
             "unstructured>=0.10.0",
+        ],
+        "llm": [
+            "torch>=2.0.0",
+            "transformers>=4.30.0",
+            "vllm>=0.4.0",
+            "llm_web_kit>=3.0.0",
         ],
         "nlp": [
             "nltk>=3.8",
