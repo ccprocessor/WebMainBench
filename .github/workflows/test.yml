@@ -1,0 +1,130 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        pip install pytest pytest-cov pytest-xdist coverage
+        
+    - name: Install optional dependencies (ignore failures)
+      run: |
+        # 尝试安装可选依赖，失败时继续
+        pip install requests || echo "requests installation failed, continuing..."
+        # llm_web_kit 可能不可用，所以允许失败
+        pip install llm_web_kit || echo "llm_web_kit not available, tests will skip related functionality"
+      continue-on-error: true
+        
+    - name: Create test directories
+      run: |
+        mkdir -p data results
+        
+    - name: Run tests
+      run: |
+        # 运行测试，生成覆盖率报告
+        python -m pytest tests/ -v --cov=webmainbench --cov-report=xml --cov-report=term-missing
+        
+    - name: Test basic usage example
+      run: |
+        # 测试基本使用示例是否能正常运行
+        python examples/basic_usage.py
+        
+    # - name: Upload coverage to Codecov
+    #   uses: codecov/codecov-action@v3
+    #   with:
+    #     file: ./coverage.xml
+    #     flags: unittests
+    #     name: codecov-umbrella
+    #     fail_ci_if_error: false
+
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v4
+    
+  #   - name: Set up Python 3.10
+  #     uses: actions/setup-python@v4
+  #     with:
+  #       python-version: '3.10'
+        
+  #   - name: Install lint dependencies
+  #     run: |
+  #       python -m pip install --upgrade pip
+  #       pip install flake8 black isort mypy
+  #       pip install -e .
+        
+  #   - name: Run flake8
+  #     run: |
+  #       # 检查代码风格，忽略一些常见的问题
+  #       flake8 webmainbench/ --count --select=E9,F63,F7,F82 --show-source --statistics
+  #       flake8 webmainbench/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+        
+  #   - name: Check import sorting
+  #     run: |
+  #       isort --check-only --diff webmainbench/
+        
+  #   - name: Check code formatting
+  #     run: |
+  #       black --check --diff webmainbench/
+
+  # docs:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v4
+    
+  #   - name: Set up Python 3.10
+  #     uses: actions/setup-python@v4
+  #     with:
+  #       python-version: '3.10'
+        
+  #   - name: Install doc dependencies
+  #     run: |
+  #       python -m pip install --upgrade pip
+  #       pip install -e .
+        
+  #   - name: Check README and documentation
+  #     run: |
+  #       # 验证README中的示例代码是否有效
+  #       python -c "
+  #       import webmainbench
+  #       from webmainbench.data import DataLoader, BenchmarkDataset
+  #       from webmainbench.evaluator import Evaluator
+  #       from webmainbench.extractors import ExtractorFactory
+  #       print('✅ 所有主要模块导入成功')
+  #       "
+        
+  #   - name: Validate examples
+  #     run: |
+  #       # 检查examples目录下的所有Python文件语法
+  #       python -m py_compile examples/*.py
+  #       echo "✅ 所有示例文件语法正确"

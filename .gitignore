@@ -45,8 +45,5 @@ output/
 .coverage*
 coverage.xml
 
-llm_web_kit.egg-info/*
-.llm-web-kit.jsonc
-.llm-web-kit-pageclassify.jsonc
-tests/llm_web_kit/extractor/ygq_testmd
-results/
+webmainbench.egg-info/*
+results/*
