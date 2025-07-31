@@ -1,2 +1,2 @@
 extractor,dataset,total_samples,success_rate,overall,code_edit,formula_edit,table_TEDS,table_edit,text_edit
-llm-webkit,llm_webkit_test,3,1.0,0.5333,0.6667,0.6667,0.6667,0.6667,0.0
+llm-webkit,WebMainBench_with_extraction,4,1.0,0.8597,0.6215,1.0,1.0,0.9073,0.7695

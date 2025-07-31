@@ -2,32 +2,34 @@
   "metadata": {
     "dataset_name": "llm_webkit_test",
     "extractor_name": "llm-webkit",
-    "timestamp": "2025-07-31T17:54:53.763314",
+    "timestamp": "2025-07-31T20:30:09.020912",
     "total_samples": 3
   },
   "overall_metrics": {
-    "code_edit": 0.8293333333333334,
+    "code_edit": 0.6666666666666666,
     "formula_edit": 0.6666666666666666,
-    "table_edit": 0.9629629629629629,
-    "table_TEDS": 1.0,
-    "text_edit": 0.6530787753697971,
-    "overall": 0.8224083476665521
+    "table_edit": 0.6666666666666666,
+    "table_TEDS": 0.6666666666666666,
+    "text_edit": 0.0,
+    "overall": 0.5333333333333333
   },
   "sample_results": [
     {
       "sample_id": "text_code_sample",
       "extraction_success": true,
-      "extraction_time": 5.772666931152344,
+      "extraction_time": 2.091538190841675,
+      "extracted_content": "",
+      "extracted_content_list": [],
       "metrics": {
         "code_edit": {
-          "score": 0.488,
+          "score": 0.0,
           "success": true,
           "details": {
-            "distance": 64,
-            "predicted_length": 125,
+            "distance": 61,
+            "predicted_length": 0,
             "groundtruth_length": 61,
             "normalized": true,
-            "predicted_code_length": 125,
+            "predicted_code_length": 0,
             "groundtruth_code_length": 61,
             "content_type": "code"
           }
@@ -72,20 +74,20 @@
           }
         },
         "text_edit": {
-          "score": 0.9298245614035088,
+          "score": 0.0,
           "success": true,
           "details": {
-            "distance": 4,
-            "predicted_length": 57,
+            "distance": 53,
+            "predicted_length": 0,
             "groundtruth_length": 53,
             "normalized": true,
-            "predicted_text_length": 57,
+            "predicted_text_length": 0,
             "groundtruth_text_length": 53,
             "content_type": "text"
           }
         },
         "overall": {
-          "score": 0.8835649122807018,
+          "score": 0.6,
           "success": true,
           "details": {
             "source": "average_of_all_metrics",
@@ -93,11 +95,11 @@
             "successful_metrics": 5,
             "failed_metrics": 0,
             "individual_scores": {
-              "code_edit": 0.488,
+              "code_edit": 0.0,
               "formula_edit": 1.0,
               "table_edit": 1.0,
               "table_TEDS": 1.0,
-              "text_edit": 0.9298245614035088
+              "text_edit": 0.0
             }
           }
         }
@@ -113,7 +115,9 @@
     {
       "sample_id": "table_sample",
       "extraction_success": true,
-      "extraction_time": 1.8626070022583008,
+      "extraction_time": 0.2268238067626953,
+      "extracted_content": "",
+      "extracted_content_list": [],
       "metrics": {
         "code_edit": {
           "score": 1.0,
@@ -142,24 +146,24 @@
           }
         },
         "table_edit": {
-          "score": 0.8888888888888888,
+          "score": 0.0,
           "success": true,
           "details": {
-            "distance": 9,
-            "predicted_length": 72,
+            "distance": 81,
+            "predicted_length": 0,
             "groundtruth_length": 81,
             "normalized": true,
-            "predicted_table_length": 72,
+            "predicted_table_length": 0,
             "groundtruth_table_length": 81,
             "content_type": "table"
           }
         },
         "table_TEDS": {
-          "score": 1.0,
+          "score": 0.0,
           "success": true,
           "details": {
-            "edit_distance": 0.0,
-            "predicted_nodes": 13,
+            "edit_distance": 13.0,
+            "predicted_nodes": 3,
             "groundtruth_nodes": 13,
             "max_nodes": 13,
             "structure_only": false,
@@ -168,20 +172,20 @@
           }
         },
         "text_edit": {
-          "score": 0.6666666666666667,
+          "score": 0.0,
           "success": true,
           "details": {
-            "distance": 3,
-            "predicted_length": 9,
+            "distance": 6,
+            "predicted_length": 0,
             "groundtruth_length": 6,
             "normalized": true,
-            "predicted_text_length": 9,
+            "predicted_text_length": 0,
             "groundtruth_text_length": 6,
             "content_type": "text"
           }
         },
         "overall": {
-          "score": 0.9111111111111111,
+          "score": 0.4,
           "success": true,
           "details": {
             "source": "average_of_all_metrics",
@@ -191,9 +195,9 @@
             "individual_scores": {
               "code_edit": 1.0,
               "formula_edit": 1.0,
-              "table_edit": 0.8888888888888888,
-              "table_TEDS": 1.0,
-              "text_edit": 0.6666666666666667
+              "table_edit": 0.0,
+              "table_TEDS": 0.0,
+              "text_edit": 0.0
             }
           }
         }
@@ -209,7 +213,9 @@
     {
       "sample_id": "formula_sample",
       "extraction_success": true,
-      "extraction_time": 1.6021418571472168,
+      "extraction_time": 0.23875904083251953,
+      "extracted_content": "",
+      "extracted_content_list": [],
       "metrics": {
         "code_edit": {
           "score": 1.0,
@@ -264,20 +270,20 @@
           }
         },
         "text_edit": {
-          "score": 0.36274509803921573,
+          "score": 0.0,
           "success": true,
           "details": {
-            "distance": 65,
-            "predicted_length": 102,
+            "distance": 37,
+            "predicted_length": 0,
             "groundtruth_length": 37,
             "normalized": true,
-            "predicted_text_length": 102,
+            "predicted_text_length": 0,
             "groundtruth_text_length": 37,
             "content_type": "text"
           }
         },
         "overall": {
-          "score": 0.6725490196078432,
+          "score": 0.6,
           "success": true,
           "details": {
             "source": "average_of_all_metrics",
@@ -289,7 +295,7 @@
               "formula_edit": 0.0,
               "table_edit": 1.0,
               "table_TEDS": 1.0,
-              "text_edit": 0.36274509803921573
+              "text_edit": 0.0
             }
           }
         }
@@ -305,12 +311,12 @@
   ],
   "category_metrics": {
     "unknown": {
-      "code_edit": 0.8293333333333334,
+      "code_edit": 0.6666666666666666,
       "formula_edit": 0.6666666666666666,
-      "table_edit": 0.9629629629629629,
-      "table_TEDS": 1.0,
-      "text_edit": 0.6530787753697971,
-      "overall": 0.8224083476665521
+      "table_edit": 0.6666666666666666,
+      "table_TEDS": 0.6666666666666666,
+      "text_edit": 0.0,
+      "overall": 0.5333333333333333
     }
   },
   "error_analysis": {
