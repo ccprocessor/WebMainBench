@@ -1,2 +1,2 @@
 extractor,total_samples,success_rate,overall,code_edit,formula_edit,table_TEDS,table_edit,text_edit
-mock,2,1.0,0.8,1.0,1.0,1.0,1.0,0.0
+llm-webkit,3,1.0,0.8221,0.8293,0.7076,1.0,0.963,0.6106

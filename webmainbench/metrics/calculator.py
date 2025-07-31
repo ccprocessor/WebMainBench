@@ -248,7 +248,11 @@ class MetricCalculator:
     
     def list_available_metrics(self) -> List[str]:
         """List all available metrics."""
-        return list(self.metrics.keys())
+        metrics = list(self.metrics.keys())
+        # Add overall metric which is calculated dynamically
+        if "overall" not in metrics:
+            metrics.insert(0, "overall")  # Put overall first
+        return metrics
     
     def get_metric_info(self, metric_name: str) -> Optional[Dict[str, Any]]:
         """Get information about a specific metric."""

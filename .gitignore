@@ -46,4 +46,3 @@ output/
 coverage.xml
 
 webmainbench.egg-info/*
-results/*
