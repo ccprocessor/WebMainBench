@@ -1,0 +1,2 @@
+extractor,total_samples,success_rate,overall,code_edit,formula_edit,table_TEDS,table_edit,text_edit
+mock,2,1.0,0.8,1.0,1.0,1.0,1.0,0.0
