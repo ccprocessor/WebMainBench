@@ -91,8 +91,9 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         code_result = results['code_edit']
         self.assertTrue(code_result.success)
         self.assertIsInstance(code_result.score, float)
-        self.assertGreaterEqual(code_result.score, 0.0)
-        self.assertLessEqual(code_result.score, 1.0)
+        # 验证固定内容的确定分数
+        self.assertAlmostEqual(code_result.score, 0.918367, places=5,
+                             msg=f"code_edit分数应该是0.918367，实际: {code_result.score}")
         
         # 验证详细信息
         self.assertEqual(code_result.details['content_type'], 'code')
@@ -110,8 +111,9 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         formula_result = results['formula_edit']
         self.assertTrue(formula_result.success)
         self.assertIsInstance(formula_result.score, float)
-        self.assertGreaterEqual(formula_result.score, 0.0)
-        self.assertLessEqual(formula_result.score, 1.0)
+        # 验证固定内容的确定分数
+        self.assertAlmostEqual(formula_result.score, 1.000000, places=5,
+                             msg=f"formula_edit分数应该是1.000000，实际: {formula_result.score}")
         
         # 验证详细信息
         self.assertEqual(formula_result.details['content_type'], 'formula')
@@ -127,8 +129,9 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         table_result = results['table_edit']
         self.assertTrue(table_result.success)
         self.assertIsInstance(table_result.score, float)
-        self.assertGreaterEqual(table_result.score, 0.0)
-        self.assertLessEqual(table_result.score, 1.0)
+        # 验证固定内容的确定分数
+        self.assertAlmostEqual(table_result.score, 0.868852, places=5,
+                             msg=f"table_edit分数应该是0.868852，实际: {table_result.score}")
         
         # 验证详细信息
         self.assertEqual(table_result.details['content_type'], 'table')
@@ -144,8 +147,9 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         teds_result = results['table_TEDS']
         self.assertTrue(teds_result.success)
         self.assertIsInstance(teds_result.score, float)
-        self.assertGreaterEqual(teds_result.score, 0.0)
-        self.assertLessEqual(teds_result.score, 1.0)
+        # 验证固定内容的确定分数
+        self.assertAlmostEqual(teds_result.score, 0.300000, places=5,
+                             msg=f"table_TEDS分数应该是0.300000，实际: {teds_result.score}")
         
         # 验证详细信息
         self.assertEqual(teds_result.details['content_type'], 'table')
@@ -160,8 +164,9 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         text_result = results['text_edit']
         self.assertTrue(text_result.success)
         self.assertIsInstance(text_result.score, float)
-        self.assertGreaterEqual(text_result.score, 0.0)
-        self.assertLessEqual(text_result.score, 1.0)
+        # 验证固定内容的确定分数
+        self.assertAlmostEqual(text_result.score, 0.769231, places=5,
+                             msg=f"text_edit分数应该是0.769231，实际: {text_result.score}")
         
         # 验证详细信息
         self.assertEqual(text_result.details['content_type'], 'text')
@@ -204,11 +209,11 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
             groundtruth_content=self.groundtruth_content
         )
         
-        # 大部分指标应该得到完美分数(1.0)，除了可能某些算法有特殊处理
+        # 完全相同的内容应该得到满分
         for metric_name in ['code_edit', 'formula_edit', 'table_edit', 'text_edit']:
             if metric_name in results and results[metric_name].success:
-                self.assertGreaterEqual(results[metric_name].score, 0.8, 
-                                      f"相同内容的{metric_name}分数应该很高")
+                self.assertAlmostEqual(results[metric_name].score, 1.0, places=5,
+                                     msg=f"相同内容的{metric_name}应该得到满分，实际: {results[metric_name].score}")
 
     def test_empty_content(self):
         """测试空内容的情况"""
@@ -222,10 +227,6 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
             if metric_name != 'overall':  # overall可能会有特殊处理
                 self.assertTrue(result.success or result.score == 0.0, 
                               f"空内容的{metric_name}应该正确处理")
-
-
-
-
 
 
 class TestErrorHandling(unittest.TestCase):
@@ -296,16 +297,17 @@ def hello_world():
             groundtruth_content=groundtruth
         )
         
-        # 验证文本编辑距离
+        # 验证文本编辑距离（固定内容应该有确定分数）
         self.assertIn("text_edit", results)
         self.assertTrue(results["text_edit"].success)
-        # 基于实际测试结果调整期望值
-        self.assertGreater(results["text_edit"].score, 0.50)
+        self.assertAlmostEqual(results["text_edit"].score, 1.000000, places=5,
+                             msg=f"text_edit分数应该是1.000000，实际: {results['text_edit'].score}")
         
-        # 验证代码编辑距离（代码内容完全一致，应该有高分）
+        # 验证代码编辑距离（缺少python标识符导致轻微差异）
         self.assertIn("code_edit", results)
         self.assertTrue(results["code_edit"].success)
-        self.assertGreater(results["code_edit"].score, 0.90)
+        self.assertAlmostEqual(results["code_edit"].score, 0.905797, places=5,
+                             msg=f"code_edit分数应该是0.905797，实际: {results['code_edit'].score}")
     
     def test_table_sample_edit_distance(self):
         """测试表格样本的编辑距离"""
@@ -328,15 +330,17 @@ def hello_world():
             groundtruth_content=groundtruth
         )
         
-        # 验证表格编辑距离（应该接近0.9022）
+        # 验证表格编辑距离（分隔符长度差异导致的固定分数）
         self.assertIn("table_edit", results)
         self.assertTrue(results["table_edit"].success)
-        self.assertGreater(results["table_edit"].score, 0.85)
+        self.assertAlmostEqual(results["table_edit"].score, 0.888889, places=5,
+                             msg=f"table_edit分数应该是0.888889，实际: {results['table_edit'].score}")
         
-        # 验证TEDS指标（表格结构相同，应该满分）
+        # 验证TEDS指标（表格结构完全相同，满分）
         self.assertIn("table_TEDS", results)
         self.assertTrue(results["table_TEDS"].success)
-        self.assertGreater(results["table_TEDS"].score, 0.95)
+        self.assertAlmostEqual(results["table_TEDS"].score, 1.000000, places=5,
+                             msg=f"table_TEDS分数应该是1.000000，实际: {results['table_TEDS'].score}")
     
     def test_formula_sample_edit_distance(self):
         """测试公式样本的编辑距离"""
@@ -361,14 +365,17 @@ $$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$"""
             groundtruth_content=groundtruth
         )
         
-        # 验证公式编辑距离（符号转义导致分数较低）
+        # 验证公式编辑距离（符号转义导致的固定低分）
         self.assertIn("formula_edit", results)
         self.assertTrue(results["formula_edit"].success)
-        self.assertGreater(results["formula_edit"].score, 0.10)
+        self.assertAlmostEqual(results["formula_edit"].score, 0.122807, places=5,
+                             msg=f"formula_edit分数应该是0.122807，实际: {results['formula_edit'].score}")
         
-        # 验证文本编辑距离（去除公式后的纯文本）
+        # 验证文本编辑距离（去除公式后的纯文本，也受符号转义影响）
         self.assertIn("text_edit", results)
         self.assertTrue(results["text_edit"].success)
+        self.assertAlmostEqual(results["text_edit"].score, 0.372093, places=5,
+                             msg=f"text_edit分数应该是0.372093，实际: {results['text_edit'].score}")
     
     def test_overall_score_calculation(self):
         """测试综合分数计算"""
