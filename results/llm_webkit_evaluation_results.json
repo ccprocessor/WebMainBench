@@ -2,34 +2,34 @@
   "metadata": {
     "dataset_name": "llm_webkit_test",
     "extractor_name": "llm-webkit",
-    "timestamp": "2025-07-31T20:30:09.020912",
+    "timestamp": "2025-07-31T20:59:00.085277",
     "total_samples": 3
   },
   "overall_metrics": {
-    "code_edit": 0.6666666666666666,
+    "code_edit": 0.8293333333333334,
     "formula_edit": 0.6666666666666666,
-    "table_edit": 0.6666666666666666,
-    "table_TEDS": 0.6666666666666666,
-    "text_edit": 0.0,
-    "overall": 0.5333333333333333
+    "table_edit": 0.9629629629629629,
+    "table_TEDS": 1.0,
+    "text_edit": 0.6530787753697971,
+    "overall": 0.8224083476665521
   },
   "sample_results": [
     {
       "sample_id": "text_code_sample",
       "extraction_success": true,
-      "extraction_time": 2.091538190841675,
-      "extracted_content": "",
+      "extraction_time": 3.8659801483154297,
+      "extracted_content": "# Python编程示例\n\n这是一段关于Python编程的介绍文本。\n\n```\ndef hello_world():\n    print(\"Hello, World!\")\n    return True\n```\n\n以上代码展示了一个简单的Python函数。",
       "extracted_content_list": [],
       "metrics": {
         "code_edit": {
-          "score": 0.0,
+          "score": 0.488,
           "success": true,
           "details": {
-            "distance": 61,
-            "predicted_length": 0,
+            "distance": 64,
+            "predicted_length": 125,
             "groundtruth_length": 61,
             "normalized": true,
-            "predicted_code_length": 0,
+            "predicted_code_length": 125,
             "groundtruth_code_length": 61,
             "content_type": "code"
           }
@@ -74,20 +74,20 @@
           }
         },
         "text_edit": {
-          "score": 0.0,
+          "score": 0.9298245614035088,
           "success": true,
           "details": {
-            "distance": 53,
-            "predicted_length": 0,
+            "distance": 4,
+            "predicted_length": 57,
             "groundtruth_length": 53,
             "normalized": true,
-            "predicted_text_length": 0,
+            "predicted_text_length": 57,
             "groundtruth_text_length": 53,
             "content_type": "text"
           }
         },
         "overall": {
-          "score": 0.6,
+          "score": 0.8835649122807018,
           "success": true,
           "details": {
             "source": "average_of_all_metrics",
@@ -95,11 +95,11 @@
             "successful_metrics": 5,
             "failed_metrics": 0,
             "individual_scores": {
-              "code_edit": 0.0,
+              "code_edit": 0.488,
               "formula_edit": 1.0,
               "table_edit": 1.0,
               "table_TEDS": 1.0,
-              "text_edit": 0.0
+              "text_edit": 0.9298245614035088
             }
           }
         }
@@ -115,8 +115,8 @@
     {
       "sample_id": "table_sample",
       "extraction_success": true,
-      "extraction_time": 0.2268238067626953,
-      "extracted_content": "",
+      "extraction_time": 1.682149887084961,
+      "extracted_content": "## 销售数据统计\n\n| 产品 | 销量 | 收入 |\n|---|---|---|\n| 产品A | 100 | 1000 |\n| 产品B | 200 | 3000 |",
       "extracted_content_list": [],
       "metrics": {
         "code_edit": {
@@ -146,24 +146,24 @@
           }
         },
         "table_edit": {
-          "score": 0.0,
+          "score": 0.8888888888888888,
           "success": true,
           "details": {
-            "distance": 81,
-            "predicted_length": 0,
+            "distance": 9,
+            "predicted_length": 72,
             "groundtruth_length": 81,
             "normalized": true,
-            "predicted_table_length": 0,
+            "predicted_table_length": 72,
             "groundtruth_table_length": 81,
             "content_type": "table"
           }
         },
         "table_TEDS": {
-          "score": 0.0,
+          "score": 1.0,
           "success": true,
           "details": {
-            "edit_distance": 13.0,
-            "predicted_nodes": 3,
+            "edit_distance": 0.0,
+            "predicted_nodes": 13,
             "groundtruth_nodes": 13,
             "max_nodes": 13,
             "structure_only": false,
@@ -172,20 +172,20 @@
           }
         },
         "text_edit": {
-          "score": 0.0,
+          "score": 0.6666666666666667,
           "success": true,
           "details": {
-            "distance": 6,
-            "predicted_length": 0,
+            "distance": 3,
+            "predicted_length": 9,
             "groundtruth_length": 6,
             "normalized": true,
-            "predicted_text_length": 0,
+            "predicted_text_length": 9,
             "groundtruth_text_length": 6,
             "content_type": "text"
           }
         },
         "overall": {
-          "score": 0.4,
+          "score": 0.9111111111111111,
           "success": true,
           "details": {
             "source": "average_of_all_metrics",
@@ -195,9 +195,9 @@
             "individual_scores": {
               "code_edit": 1.0,
               "formula_edit": 1.0,
-              "table_edit": 0.0,
-              "table_TEDS": 0.0,
-              "text_edit": 0.0
+              "table_edit": 0.8888888888888888,
+              "table_TEDS": 1.0,
+              "text_edit": 0.6666666666666667
             }
           }
         }
@@ -213,8 +213,8 @@
     {
       "sample_id": "formula_sample",
       "extraction_success": true,
-      "extraction_time": 0.23875904083251953,
-      "extracted_content": "",
+      "extraction_time": 1.5459110736846924,
+      "extracted_content": "## 数学公式示例\n\n这是一个行内公式: \\$E = mc^2\\$\n\n这是一个行间公式:\n\n\\$\\$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}\\$\\$",
       "extracted_content_list": [],
       "metrics": {
         "code_edit": {
@@ -270,20 +270,20 @@
           }
         },
         "text_edit": {
-          "score": 0.0,
+          "score": 0.36274509803921573,
           "success": true,
           "details": {
-            "distance": 37,
-            "predicted_length": 0,
+            "distance": 65,
+            "predicted_length": 102,
             "groundtruth_length": 37,
             "normalized": true,
-            "predicted_text_length": 0,
+            "predicted_text_length": 102,
             "groundtruth_text_length": 37,
             "content_type": "text"
           }
         },
         "overall": {
-          "score": 0.6,
+          "score": 0.6725490196078432,
           "success": true,
           "details": {
             "source": "average_of_all_metrics",
@@ -295,7 +295,7 @@
               "formula_edit": 0.0,
               "table_edit": 1.0,
               "table_TEDS": 1.0,
-              "text_edit": 0.0
+              "text_edit": 0.36274509803921573
             }
           }
         }
@@ -311,12 +311,12 @@
   ],
   "category_metrics": {
     "unknown": {
-      "code_edit": 0.6666666666666666,
+      "code_edit": 0.8293333333333334,
       "formula_edit": 0.6666666666666666,
-      "table_edit": 0.6666666666666666,
-      "table_TEDS": 0.6666666666666666,
-      "text_edit": 0.0,
-      "overall": 0.5333333333333333
+      "table_edit": 0.9629629629629629,
+      "table_TEDS": 1.0,
+      "text_edit": 0.6530787753697971,
+      "overall": 0.8224083476665521
     }
   },
   "error_analysis": {
