@@ -31,26 +31,8 @@ class DataLoader:
         with jsonlines.open(file_path, 'r') as reader:
             for idx, line in enumerate(reader):
                 try:
-                    # Ensure required fields exist
-                    sample_id = line.get('id', f"sample_{idx}")
-                    html = line.get('html', '')
-                    content = line.get('content', '')
-                    content_list = line.get('content_list', [])
-                    
-                    # Create data sample
-                    sample = DataSample(
-                        id=sample_id,
-                        html=html,
-                        groundtruth_content=content,
-                        groundtruth_content_list=content_list,
-                        url=line.get('url'),
-                        domain=line.get('domain'),
-                        language=line.get('language'),
-                        content_type=line.get('content_type'),
-                        difficulty=line.get('difficulty'),
-                        tags=line.get('tags'),
-                    )
-                    
+                    # 使用DataSample.from_dict()来正确处理字段映射和过滤
+                    sample = DataSample.from_dict(line)
                     dataset.add_sample(sample)
                     
                 except Exception as e:

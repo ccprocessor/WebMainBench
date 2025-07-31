@@ -187,6 +187,8 @@ class Evaluator:
             'sample_id': sample.id,
             'extraction_success': extraction_result.success,
             'extraction_time': extraction_result.extraction_time,
+            'extracted_content': extraction_result.content if extraction_result.success else None,
+            'extracted_content_list': extraction_result.content_list if extraction_result.success else None,
         }
         
         if not extraction_result.success:
