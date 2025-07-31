@@ -235,27 +235,9 @@ class CodeEditMetric(EditDistanceMetric):
     
     def _extract_code_content(self, text: str, content_list: List[Dict[str, Any]] = None) -> str:
         """从文本和content_list中提取代码内容"""
-        code_parts = []
-        
-        # 优先从content_list中递归提取
-        if content_list:
-            code_parts = self._extract_codes_from_content_list(content_list)
-            
-            # 如果content_list中有代码，直接返回
-            if code_parts:
-                return '\n'.join(code_parts)
-        
-        # 只有当content_list中没有代码时，才从markdown文本中提取
-        if text:
-            # 提取代码块 ```code```
-            code_blocks = re.findall(r'```[\s\S]*?```', text)
-            code_parts.extend([block.strip('`').strip() for block in code_blocks])
-            
-            # 提取行内代码 `code`
-            inline_codes = re.findall(r'`([^`]+)`', text)
-            code_parts.extend(inline_codes)
-        
-        return '\n'.join(code_parts)
+        # 使用统一的内容分割方法
+        content_parts = self.split_content(text, content_list)
+        return content_parts.get('code', '')
     
     def _extract_codes_from_content_list(self, content_list: List[Dict[str, Any]]) -> List[str]:
         """递归从content_list中提取代码内容"""
@@ -319,39 +301,9 @@ class TextEditMetric(EditDistanceMetric):
     
     def _extract_pure_text(self, text: str, content_list: List[Dict[str, Any]] = None) -> str:
         """提取纯文本内容（排除代码、表格、公式）"""
-        # 如果有content_list，优先使用其中的文本内容（递归提取）
-        if content_list:
-            text_parts = self._extract_text_from_content_list(content_list)
-            if text_parts:
-                return '\n'.join(text_parts)
-        
-        # 如果没有content_list或content_list为空，且text也为空，返回空字符串
-        if not text:
-            return ""
-        
-        # 复制原文本
-        clean_text = text
-        
-        # 移除代码块
-        clean_text = re.sub(r'```[\s\S]*?```', '', clean_text)
-        clean_text = re.sub(r'`[^`]+`', '', clean_text)
-        
-        # 移除公式
-        clean_text = re.sub(r'\$\$[^$]+\$\$', '', clean_text)
-        clean_text = re.sub(r'(?<!\$)\$[^$]+\$(?!\$)', '', clean_text)
-        
-        # 移除表格
-        lines = clean_text.split('\n')
-        non_table_lines = []
-        for line in lines:
-            if '|' not in line or not line.strip():
-                non_table_lines.append(line)
-        
-        clean_text = '\n'.join(non_table_lines)
-        
-        # 清理多余的空行
-        clean_text = re.sub(r'\n\s*\n', '\n\n', clean_text)
-        return clean_text.strip()
+        # 使用统一的内容分割方法
+        content_parts = self.split_content(text, content_list)
+        return content_parts.get('text', '')
     
     def _extract_text_from_content_list(self, content_list: List[Dict[str, Any]]) -> List[str]:
         """递归从content_list中提取纯文本内容（排除代码、表格、公式）"""

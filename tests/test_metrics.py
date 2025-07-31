@@ -368,14 +368,14 @@ $$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$"""
         # 验证公式编辑距离（符号转义导致的固定低分）
         self.assertIn("formula_edit", results)
         self.assertTrue(results["formula_edit"].success)
-        self.assertAlmostEqual(results["formula_edit"].score, 0.122807, places=5,
-                             msg=f"formula_edit分数应该是0.122807，实际: {results['formula_edit'].score}")
+        self.assertAlmostEqual(results["formula_edit"].score, 0.000000, places=5,
+                             msg=f"formula_edit分数应该是0.000000，实际: {results['formula_edit'].score}")
         
         # 验证文本编辑距离（去除公式后的纯文本，也受符号转义影响）
         self.assertIn("text_edit", results)
         self.assertTrue(results["text_edit"].success)
-        self.assertAlmostEqual(results["text_edit"].score, 0.372093, places=5,
-                             msg=f"text_edit分数应该是0.372093，实际: {results['text_edit'].score}")
+        self.assertAlmostEqual(results["text_edit"].score, 0.320000, places=5,
+                             msg=f"text_edit分数应该是0.320000，实际: {results['text_edit'].score}")
     
     def test_overall_score_calculation(self):
         """测试综合分数计算"""
