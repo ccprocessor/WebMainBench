@@ -57,26 +57,7 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
 最后是正确的文字内容。
 """
 
-        # 构建content_list (模拟结构化数据)
-        self.predicted_content_list = [
-            {"type": "heading", "content": "标题", "level": 1},
-            {"type": "paragraph", "content": "这是一段文字内容。"},
-            {"type": "code", "content": 'def hello():\n    print("Hello World")'},
-            {"type": "paragraph", "content": "这是公式: $E = mc^2$"},
-            {"type": "equation-interline", "content": "\\int_{0}^{\\infty} e^{-x} dx = 1"},
-            {"type": "table", "content": "| 列1 | 列2 |\n|-----|-----|\n| 数据1 | 数据2 |\n| 数据3 | 数据4 |"},
-            {"type": "paragraph", "content": "最后是更多文字内容。"}
-        ]
-        
-        self.groundtruth_content_list = [
-            {"type": "heading", "content": "标题", "level": 1},
-            {"type": "paragraph", "content": "这是一段正确的文字内容。"},
-            {"type": "code", "content": 'def hello():\n    print("Hello, World!")'},
-            {"type": "paragraph", "content": "这是正确的公式: $E = mc^2$"},
-            {"type": "equation-interline", "content": "\\int_{0}^{\\infty} e^{-x} dx = 1"},
-            {"type": "table", "content": "| 列1 | 列2 |\n|-----|-----|\n| 正确数据1 | 正确数据2 |\n| 正确数据3 | 正确数据4 |"},
-            {"type": "paragraph", "content": "最后是正确的文字内容。"}
-        ]
+
 
     def test_available_metrics(self):
         """测试可用指标列表"""
@@ -91,9 +72,7 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         """测试指标计算成功"""
         results = self.calculator.calculate_all(
             predicted_content=self.predicted_content,
-            groundtruth_content=self.groundtruth_content,
-            predicted_content_list=self.predicted_content_list,
-            groundtruth_content_list=self.groundtruth_content_list
+            groundtruth_content=self.groundtruth_content
         )
         
         # 验证所有指标都计算成功
@@ -106,9 +85,7 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         """测试代码编辑距离指标"""
         results = self.calculator.calculate_all(
             predicted_content=self.predicted_content,
-            groundtruth_content=self.groundtruth_content,
-            predicted_content_list=self.predicted_content_list,
-            groundtruth_content_list=self.groundtruth_content_list
+            groundtruth_content=self.groundtruth_content
         )
         
         code_result = results['code_edit']
@@ -127,9 +104,7 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         """测试公式编辑距离指标"""
         results = self.calculator.calculate_all(
             predicted_content=self.predicted_content,
-            groundtruth_content=self.groundtruth_content,
-            predicted_content_list=self.predicted_content_list,
-            groundtruth_content_list=self.groundtruth_content_list
+            groundtruth_content=self.groundtruth_content
         )
         
         formula_result = results['formula_edit']
@@ -146,9 +121,7 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         """测试表格编辑距离指标"""
         results = self.calculator.calculate_all(
             predicted_content=self.predicted_content,
-            groundtruth_content=self.groundtruth_content,
-            predicted_content_list=self.predicted_content_list,
-            groundtruth_content_list=self.groundtruth_content_list
+            groundtruth_content=self.groundtruth_content
         )
         
         table_result = results['table_edit']
@@ -165,9 +138,7 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         """测试表格TEDS指标"""
         results = self.calculator.calculate_all(
             predicted_content=self.predicted_content,
-            groundtruth_content=self.groundtruth_content,
-            predicted_content_list=self.predicted_content_list,
-            groundtruth_content_list=self.groundtruth_content_list
+            groundtruth_content=self.groundtruth_content
         )
         
         teds_result = results['table_TEDS']
@@ -183,9 +154,7 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         """测试纯文本编辑距离指标"""
         results = self.calculator.calculate_all(
             predicted_content=self.predicted_content,
-            groundtruth_content=self.groundtruth_content,
-            predicted_content_list=self.predicted_content_list,
-            groundtruth_content_list=self.groundtruth_content_list
+            groundtruth_content=self.groundtruth_content
         )
         
         text_result = results['text_edit']
@@ -202,9 +171,7 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         """测试overall指标是其他指标的平均值"""
         results = self.calculator.calculate_all(
             predicted_content=self.predicted_content,
-            groundtruth_content=self.groundtruth_content,
-            predicted_content_list=self.predicted_content_list,
-            groundtruth_content_list=self.groundtruth_content_list
+            groundtruth_content=self.groundtruth_content
         )
         
         # 获取individual指标分数
@@ -234,9 +201,7 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         # 使用相同的内容
         results = self.calculator.calculate_all(
             predicted_content=self.groundtruth_content,
-            groundtruth_content=self.groundtruth_content,
-            predicted_content_list=self.groundtruth_content_list,
-            groundtruth_content_list=self.groundtruth_content_list
+            groundtruth_content=self.groundtruth_content
         )
         
         # 大部分指标应该得到完美分数(1.0)，除了可能某些算法有特殊处理
@@ -249,9 +214,7 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         """测试空内容的情况"""
         results = self.calculator.calculate_all(
             predicted_content="",
-            groundtruth_content="",
-            predicted_content_list=[],
-            groundtruth_content_list=[]
+            groundtruth_content=""
         )
         
         # 空内容应该能正确处理，不应该出错
@@ -260,72 +223,9 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
                 self.assertTrue(result.success or result.score == 0.0, 
                               f"空内容的{metric_name}应该正确处理")
 
-    def test_content_list_priority(self):
-        """测试content_list优先级"""
-        # 创建有差异的content_list
-        different_predicted_list = [
-            {"type": "heading", "content": "标题1"},
-            {"type": "paragraph", "content": "这是不同的文字段落。"},
-            {"type": "code", "content": "print('different code')"},
-            {"type": "paragraph", "content": "另一段不同的文字。"},
-            {"type": "table", "content": "| A | B |\n|---|---|\n| 1 | 2 |"},
-            {"type": "text", "content": "更多的不同文字"}
-        ]
-        
-        different_groundtruth_list = [
-            {"type": "heading", "content": "标题2"},
-            {"type": "paragraph", "content": "这是原始的文字段落。"},
-            {"type": "code", "content": "print('original code')"},
-            {"type": "paragraph", "content": "另一段原始的文字。"},
-            {"type": "table", "content": "| X | Y |\n|---|---|\n| 3 | 4 |"},
-            {"type": "text", "content": "更多的原始文字"}
-        ]
-        
-        # 只提供content_list，不提供content
-        results = self.calculator.calculate_all(
-            predicted_content="",  # 空的content
-            groundtruth_content="",
-            predicted_content_list=different_predicted_list,
-            groundtruth_content_list=different_groundtruth_list
-        )
-        
-        # 验证即使content为空，也能从content_list中提取内容
-        for metric_name in ['code_edit', 'table_edit', 'text_edit']:
-            if metric_name in results:
-                result = results[metric_name]
-                self.assertTrue(result.success, f"{metric_name}应该能从content_list提取内容")
-                # 分数应该有意义（不为1.0，因为有差异）
-                self.assertLess(result.score, 1.0, f"{metric_name}应该检测到差异")
 
-    def test_nested_content_list(self):
-        """测试嵌套的content_list结构"""
-        nested_content_list = [
-            {
-                "type": "section",
-                "children": [
-                    {"type": "code", "content": "print('nested code')"},
-                    {
-                        "type": "list", 
-                        "items": [
-                            {"type": "equation-inline", "content": "x = 1"}
-                        ]
-                    }
-                ]
-            }
-        ]
-        
-        results = self.calculator.calculate_all(
-            predicted_content="",
-            groundtruth_content="",
-            predicted_content_list=nested_content_list,
-            groundtruth_content_list=nested_content_list
-        )
-        
-        # 验证能正确处理嵌套结构
-        for metric_name in ['code_edit', 'formula_edit']:
-            if metric_name in results:
-                self.assertTrue(results[metric_name].success, 
-                              f"{metric_name}应该能处理嵌套的content_list")
+
+
 
 
 class TestErrorHandling(unittest.TestCase):
@@ -334,20 +234,12 @@ class TestErrorHandling(unittest.TestCase):
     def setUp(self):
         self.calculator = MetricCalculator()
 
-    def test_malformed_content_list(self):
-        """测试格式错误的content_list"""
-        malformed_list = [
-            {"invalid": "structure"},  # 缺少type字段
-            "not_a_dict",  # 不是字典
-            {"type": "code", "content": None}  # content为None
-        ]
-        
-        # 应该能处理错误格式而不崩溃
+    def test_malformed_content(self):
+        """测试格式错误的输入"""
+        # 应该能处理各种错误输入而不崩溃
         results = self.calculator.calculate_all(
             predicted_content="test",
-            groundtruth_content="test", 
-            predicted_content_list=malformed_list,
-            groundtruth_content_list=malformed_list
+            groundtruth_content="test"
         )
         
         # 不应该有未捕获的异常
@@ -357,13 +249,220 @@ class TestErrorHandling(unittest.TestCase):
         """测试None输入"""
         results = self.calculator.calculate_all(
             predicted_content=None,
-            groundtruth_content=None,
-            predicted_content_list=None,
-            groundtruth_content_list=None
+            groundtruth_content=None
         )
         
         # 应该能处理None输入
         self.assertIsInstance(results, dict)
+
+
+class TestRealSampleMetrics(unittest.TestCase):
+    """测试基于LLM-WebKit实际提取结果的指标计算"""
+    
+    def setUp(self):
+        """测试前准备"""
+        self.calculator = MetricCalculator()
+    
+    def test_text_code_sample_edit_distance(self):
+        """测试文本+代码样本的编辑距离"""
+        # 基于实际调试结果的数据
+        groundtruth = """# Python编程示例
+
+这是一段关于Python编程的介绍文本。
+
+```python
+def hello_world():
+    print("Hello, World!")
+    return True
+```
+
+以上代码展示了一个简单的Python函数。"""
+        
+        predicted = """# Python编程示例
+
+这是一段关于Python编程的介绍文本。
+
+```
+def hello_world():
+    print("Hello, World!")
+    return True
+```
+
+以上代码展示了一个简单的Python函数。"""
+        
+        # 计算编辑距离（基于实际调试结果）
+        results = self.calculator.calculate_all(
+            predicted_content=predicted,
+            groundtruth_content=groundtruth
+        )
+        
+        # 验证文本编辑距离
+        self.assertIn("text_edit", results)
+        self.assertTrue(results["text_edit"].success)
+        # 基于实际测试结果调整期望值
+        self.assertGreater(results["text_edit"].score, 0.50)
+        
+        # 验证代码编辑距离（代码内容完全一致，应该有高分）
+        self.assertIn("code_edit", results)
+        self.assertTrue(results["code_edit"].success)
+        self.assertGreater(results["code_edit"].score, 0.90)
+    
+    def test_table_sample_edit_distance(self):
+        """测试表格样本的编辑距离"""
+        groundtruth = """## 销售数据统计
+
+| 产品 | 销量 | 收入 |
+|------|------|------|
+| 产品A | 100 | 1000 |
+| 产品B | 200 | 3000 |"""
+        
+        predicted = """## 销售数据统计
+
+| 产品 | 销量 | 收入 |
+|---|---|---|
+| 产品A | 100 | 1000 |
+| 产品B | 200 | 3000 |"""
+        
+        results = self.calculator.calculate_all(
+            predicted_content=predicted,
+            groundtruth_content=groundtruth
+        )
+        
+        # 验证表格编辑距离（应该接近0.9022）
+        self.assertIn("table_edit", results)
+        self.assertTrue(results["table_edit"].success)
+        self.assertGreater(results["table_edit"].score, 0.85)
+        
+        # 验证TEDS指标（表格结构相同，应该满分）
+        self.assertIn("table_TEDS", results)
+        self.assertTrue(results["table_TEDS"].success)
+        self.assertGreater(results["table_TEDS"].score, 0.95)
+    
+    def test_formula_sample_edit_distance(self):
+        """测试公式样本的编辑距离"""
+        groundtruth = """## 数学公式示例
+
+这是一个行内公式: $E = mc^2$
+
+这是一个行间公式:
+
+$$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$"""
+        
+        predicted = """## 数学公式示例
+
+这是一个行内公式: \\$E = mc^2\\$
+
+这是一个行间公式:
+
+\\$\\$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}\\$"""
+        
+        results = self.calculator.calculate_all(
+            predicted_content=predicted,
+            groundtruth_content=groundtruth
+        )
+        
+        # 验证公式编辑距离（符号转义导致分数较低）
+        self.assertIn("formula_edit", results)
+        self.assertTrue(results["formula_edit"].success)
+        self.assertGreater(results["formula_edit"].score, 0.10)
+        
+        # 验证文本编辑距离（去除公式后的纯文本）
+        self.assertIn("text_edit", results)
+        self.assertTrue(results["text_edit"].success)
+    
+    def test_overall_score_calculation(self):
+        """测试综合分数计算"""
+        # 使用第一个样本测试综合分数
+        groundtruth = """# Python编程示例
+
+这是一段关于Python编程的介绍文本。
+
+```python
+def hello_world():
+    print("Hello, World!")
+    return True
+```
+
+以上代码展示了一个简单的Python函数。"""
+        
+        predicted = """# Python编程示例
+
+这是一段关于Python编程的介绍文本。
+
+```
+def hello_world():
+    print("Hello, World!")
+    return True
+```
+
+以上代码展示了一个简单的Python函数。"""
+        
+        results = self.calculator.calculate_all(
+            predicted_content=predicted,
+            groundtruth_content=groundtruth
+        )
+        
+        # 验证overall分数存在且合理
+        self.assertIn("overall", results)
+        self.assertTrue(results["overall"].success)
+        
+        # overall应该是所有成功指标的平均值
+        successful_scores = []
+        for metric_name, result in results.items():
+            if metric_name != "overall" and result.success:
+                successful_scores.append(result.score)
+        
+        if successful_scores:
+            expected_overall = sum(successful_scores) / len(successful_scores)
+            actual_overall = results["overall"].score
+            
+            # 允许小幅计算误差
+            self.assertAlmostEqual(actual_overall, expected_overall, places=3)
+    
+    def test_all_metrics_coverage(self):
+        """测试所有6项指标都被计算"""
+        groundtruth = """# 综合示例
+
+这是文本内容。
+
+```python
+def test():
+    return True
+```
+
+这是公式: $x = y$
+
+| A | B |
+|---|---|
+| 1 | 2 |
+
+更多文本。"""
+        
+        predicted = groundtruth  # 使用相同内容测试
+        
+        results = self.calculator.calculate_all(
+            predicted_content=predicted,
+            groundtruth_content=groundtruth
+        )
+        
+        # 验证所有6项指标都存在
+        expected_metrics = ["overall", "text_edit", "code_edit", "table_edit", "table_TEDS", "formula_edit"]
+        
+        print(f"\n=== 完全相同内容的指标测试结果 ===")
+        
+        for metric in expected_metrics:
+            self.assertIn(metric, results, f"指标 {metric} 缺失")
+            self.assertTrue(results[metric].success, f"指标 {metric} 计算失败")
+            
+            score = results[metric].score
+            print(f"{metric}: {score:.6f}")
+            
+            # 完全相同的内容应该得到满分 1.0
+            self.assertAlmostEqual(score, 1.0, 
+                                 places=4,
+                                 msg=f"完全相同内容的 {metric} 应该得到满分，实际得分: {score}")
+        
+        print("✅ 所有指标都正确得到满分!")
 
 
 def run_visual_test():
@@ -424,34 +523,11 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
 最后是正确的文字内容。
 """
 
-    # 构建content_list (模拟结构化数据)
-    predicted_content_list = [
-        {"type": "heading", "content": "标题", "level": 1},
-        {"type": "paragraph", "content": "这是一段文字内容。"},
-        {"type": "code", "content": 'def hello():\n    print("Hello World")'},
-        {"type": "paragraph", "content": "这是公式: $E = mc^2$"},
-        {"type": "equation-interline", "content": "\\int_{0}^{\\infty} e^{-x} dx = 1"},
-        {"type": "table", "content": "| 列1 | 列2 |\n|-----|-----|\n| 数据1 | 数据2 |\n| 数据3 | 数据4 |"},
-        {"type": "paragraph", "content": "最后是更多文字内容。"}
-    ]
-    
-    groundtruth_content_list = [
-        {"type": "heading", "content": "标题", "level": 1},
-        {"type": "paragraph", "content": "这是一段正确的文字内容。"},
-        {"type": "code", "content": 'def hello():\n    print("Hello, World!")'},
-        {"type": "paragraph", "content": "这是正确的公式: $E = mc^2$"},
-        {"type": "equation-interline", "content": "\\int_{0}^{\\infty} e^{-x} dx = 1"},
-        {"type": "table", "content": "| 列1 | 列2 |\n|-----|-----|\n| 正确数据1 | 正确数据2 |\n| 正确数据3 | 正确数据4 |"},
-        {"type": "paragraph", "content": "最后是正确的文字内容。"}
-    ]
-    
     # 计算所有指标
     print("正在计算指标...")
     results = calculator.calculate_all(
         predicted_content=predicted_content,
-        groundtruth_content=groundtruth_content,
-        predicted_content_list=predicted_content_list,
-        groundtruth_content_list=groundtruth_content_list
+        groundtruth_content=groundtruth_content
     )
     
     # 显示结果

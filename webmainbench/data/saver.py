@@ -5,8 +5,13 @@ Data saver for WebMainBench.
 import json
 import jsonlines
 from pathlib import Path
-from typing import Union, List, Dict, Any
+from typing import Union, List, Dict, Any, TYPE_CHECKING
+
 from .dataset import BenchmarkDataset, DataSample
+
+if TYPE_CHECKING:
+    from ..evaluator import EvaluationResult
+    from ..metrics import MetricResult
 
 
 class DataSaver:
@@ -73,41 +78,48 @@ class DataSaver:
             json.dump(data, f, indent=indent, ensure_ascii=False)
     
     @staticmethod
-    def save_evaluation_results(results: Dict[str, Any], 
+    def save_evaluation_results(results: Union["EvaluationResult", Dict[str, Any]], 
                               file_path: Union[str, Path],
                               format: str = "json") -> None:
         """
         Save evaluation results.
         
         Args:
-            results: Evaluation results dictionary
+            results: EvaluationResult instance or evaluation results dictionary
             file_path: Output file path
             format: Output format ("json" or "jsonl")
         """
         file_path = Path(file_path)
         file_path.parent.mkdir(parents=True, exist_ok=True)
         
+        # Convert EvaluationResult to dict if needed
+        if hasattr(results, 'to_dict'):
+            results_dict = results.to_dict()
+        else:
+            results_dict = results
+        
         if format.lower() == "json":
             with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump(results, f, indent=2, ensure_ascii=False)
+                json.dump(results_dict, f, indent=2, ensure_ascii=False)
         elif format.lower() == "jsonl":
             with jsonlines.open(file_path, 'w') as writer:
-                if isinstance(results, dict) and 'samples' in results:
-                    for sample_result in results['samples']:
+                if isinstance(results_dict, dict) and 'samples' in results_dict:
+                    for sample_result in results_dict['samples']:
                         writer.write(sample_result)
                 else:
-                    writer.write(results)
+                    writer.write(results_dict)
         else:
             raise ValueError(f"Unsupported format: {format}")
     
     @staticmethod
-    def save_summary_report(results: Union[Dict[str, Any], List[Dict[str, Any]]], 
+    def save_summary_report(results: Union["EvaluationResult", List["EvaluationResult"], Dict[str, Any], List[Dict[str, Any]]], 
                           file_path: Union[str, Path]) -> None:
         """
         Save evaluation results as a CSV leaderboard.
         
         Args:
-            results: Single evaluation results dictionary or list of results for multiple extractors
+            results: Single EvaluationResult instance, list of EvaluationResult instances, 
+                    or their dictionary representations
             file_path: Output CSV file path
         """
         import csv
@@ -115,11 +127,14 @@ class DataSaver:
         file_path = Path(file_path)
         file_path.parent.mkdir(parents=True, exist_ok=True)
         
-        # Ensure we have a list of results
-        if isinstance(results, dict):
-            results_list = [results]
+        # Convert EvaluationResult objects to dicts and ensure we have a list
+        def to_dict_if_needed(item):
+            return item.to_dict() if hasattr(item, 'to_dict') else item
+        
+        if isinstance(results, list):
+            results_list = [to_dict_if_needed(item) for item in results]
         else:
-            results_list = results
+            results_list = [to_dict_if_needed(results)]
         
         # Prepare CSV data
         csv_data = []
@@ -135,13 +150,10 @@ class DataSaver:
                 'success_rate': error_analysis.get('success_rate', 0.0)
             }
             
-            # Add only specified metrics
+            # Add all available metrics from overall_metrics
             if 'overall_metrics' in result:
-                metrics_to_include = ['overall', 'table_extraction', 'formula_extraction']
-                for metric_name in metrics_to_include:
-                    if metric_name in result['overall_metrics']:
-                        value = result['overall_metrics'][metric_name]
-                        row[metric_name] = round(value, 4) if isinstance(value, (int, float)) else value
+                for metric_name, value in result['overall_metrics'].items():
+                    row[metric_name] = round(value, 4) if isinstance(value, (int, float)) else value
             
             csv_data.append(row)
         
@@ -153,10 +165,26 @@ class DataSaver:
         
         # Write CSV file
         if csv_data:
-            # Define specific field order
-            fieldnames = ['extractor', 'total_samples', 'success_rate', 'overall', 'table_extraction', 'formula_extraction']
-            # Only include fields that exist in the data
-            fieldnames = [f for f in fieldnames if f in csv_data[0]]
+            # Define field order: basic info first, then overall, then other metrics alphabetically
+            basic_fields = ['extractor', 'total_samples', 'success_rate']
+            
+            # Get all metric fields from the data
+            all_fields = set()
+            for row in csv_data:
+                all_fields.update(row.keys())
+            
+            # Remove basic fields from metrics
+            metric_fields = all_fields - set(basic_fields)
+            
+            # Sort metrics: overall first, then alphabetically
+            sorted_metrics = []
+            if 'overall' in metric_fields:
+                sorted_metrics.append('overall')
+                metric_fields.remove('overall')
+            sorted_metrics.extend(sorted(metric_fields))
+            
+            # Final field order
+            fieldnames = basic_fields + sorted_metrics
             
             with open(file_path, 'w', newline='', encoding='utf-8') as f:
                 writer = csv.DictWriter(f, fieldnames=fieldnames)
