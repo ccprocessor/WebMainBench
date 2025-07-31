@@ -3,7 +3,7 @@
 Magic HTML extractor implementation.
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from .base import BaseExtractor, ExtractionResult
 from .factory import extractor
 from magic_html import GeneralExtractor
@@ -24,29 +24,16 @@ class MagicHtmlExtractor(BaseExtractor):
             raise RuntimeError(f"Failed to initialize Magic HTML extractor: {e}")
 
     def _extract_content(self, html: str, url: str = None) -> ExtractionResult:
-        """
-        Extract content using Magic HTML.
-
-        Args:
-            html: HTML content to extract from
-            url: Optional URL of the page
-
-        Returns:
-            ExtractionResult instance
-        """
         try:
             # Use Magic HTML for extraction
-            data = self.extractor.extract(html, base_url=url)
+            data = self.extractor.extract(html)
 
             # 从输出中提取所需信息
             extracted_html = data.get('html', '')
             title = data.get('title', '')
-            base_url = data.get('base_url', url)
 
             # 简单地将提取的 HTML 作为内容
             content = extracted_html
-            # print("解析后的文本:")
-            # print(content)
             # 创建 content_list（简单分割段落）
             content_list = []
             if content:
@@ -58,13 +45,11 @@ class MagicHtmlExtractor(BaseExtractor):
                             "content": para.strip(),
                             "index": i
                         })
-            data = self.extractor.extract(html, base_url=url)
-
 
             return ExtractionResult(
                 content=content,
                 content_list=content_list,
-                title=title,
+                title=None,
                 success=True
             )
 
@@ -72,3 +57,22 @@ class MagicHtmlExtractor(BaseExtractor):
             return ExtractionResult.create_error_result(
                 f"Magic HTML extraction failed: {str(e)}"
             )
+
+        def _calculate_confidence(self, content: str, content_list: List[Dict], item_count: int) -> float:
+            """计算提取置信度."""
+            if not content:
+                return 0.0
+
+            # 基于内容长度的评分
+            length_score = min(len(content) / 1000, 1.0)
+
+            # 基于结构化内容的评分
+            structure_score = min(len(content_list) / 10, 1.0) if content_list else 0.0
+
+            # 基于处理复杂度的评分（item数量越多，置信度稍微降低）
+            complexity_penalty = max(0, (item_count - 100) / 900)  # 100-1000范围内线性降低
+            complexity_score = max(0.5, 1.0 - complexity_penalty)
+
+            # 综合评分
+            confidence = (length_score * 0.5 + structure_score * 0.3 + complexity_score * 0.2)
+            return min(confidence, 1.0)

@@ -1,16 +1,27 @@
 import time
 from webmainbench.extractors import ExtractorFactory
 
-# 配置 MagicHTML 抽取器（这里可根据需要添加更多配置）
-config = {}
+# 配置 Resiliparse 抽取器
+config = {
+    "main_content": True,
+    "alt_texts": True,
+    "links": False,
+    "form_fields": False,
+    "noscript": False,
+    "list_bullets": True,
+    "preserve_formatting": True,
+    "comments": True
+}
+
 try:
-    # 创建 MagicHTML 抽取器实例
-    extractor = ExtractorFactory.create("magic-html", config=config)
+    # 创建 Resiliparse 抽取器实例
+    extractor = ExtractorFactory.create("resiliparse", config=config)
     print(f"✅ Extractor创建成功: {extractor.description}")
     print(f"📋 版本: {extractor.version}")
     print(f"⚙️ 配置: {extractor.get_config()}\n")
 except Exception as e:
     print(f"❌ Extractor创建失败: {e}")
+
 
 # 测试 HTML
 test_html = """

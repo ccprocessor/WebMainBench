@@ -1,8 +1,7 @@
 """
 resiliparse extractor implementation.
 """
-
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from .base import BaseExtractor, ExtractionResult
 from .factory import extractor
 from resiliparse.extract.html2text import extract_plain_text
@@ -68,3 +67,22 @@ class ResiliparseExtractor(BaseExtractor):
             return ExtractionResult.create_error_result(
                 f"Resiliparse extraction failed: {str(e)}"
             )
+
+    def _calculate_confidence(self, content: str, content_list: List[Dict], item_count: int) -> float:
+        """计算提取置信度."""
+        if not content:
+            return 0.0
+
+        # 基于内容长度的评分
+        length_score = min(len(content) / 1000, 1.0)
+
+        # 基于结构化内容的评分
+        structure_score = min(len(content_list) / 10, 1.0) if content_list else 0.0
+
+        # 基于处理复杂度的评分（item数量越多，置信度稍微降低）
+        complexity_penalty = max(0, (item_count - 100) / 900)  # 100-1000范围内线性降低
+        complexity_score = max(0.5, 1.0 - complexity_penalty)
+
+        # 综合评分
+        confidence = (length_score * 0.5 + structure_score * 0.3 + complexity_score * 0.2)
+        return min(confidence, 1.0)
