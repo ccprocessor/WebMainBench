@@ -1,49 +1,36 @@
 # WebMainBench
 
-WebMainBench 是一个专门用于评测网页正文抽取质量的综合性基准测试工具。
+WebMainBench 是一个专门用于端到端评测网页正文抽取质量的基准测试工具。
 
 ## 功能特点
 
 ### 🎯 **核心功能**
-- **多抽取器支持**: 支持 LLM-WebKit、Unstructured、Jina AI 等多种抽取工具
-- **全面的评测指标**: 包含文本相似度、表格抽取、公式识别、结构保持等多维度指标
-- **灵活的数据格式**: 支持 JSONL、JSON 等多种数据格式
-- **人工标注支持**: 支持 `cc-select="true"` 标注的 groundtruth 数据
-
-### 📊 **评测指标**
-- **文本指标**: 编辑距离、BLEU、ROUGE 等
-- **表格指标**: 表格结构识别准确率
-- **公式指标**: 数学公式抽取质量
-- **结构指标**: 内容层次结构保持度
+- **多抽取器支持**: 支持 LLM-WebKit、Jina AI 等多种抽取工具
+- **全面的评测指标**: 包含文本编辑距离、表格结构相似度(TEDS)、公式抽取质量等多维度指标
+- **人工标注支持**: 评测数据集100%人工标注
 
 #### 指标详细说明
 
 | 指标名称 | 中文名称 | 取值范围 | 说明 |
 |---------|----------|----------|------|
-| `overall` | 综合得分 | 0.0-1.0 | 基于编辑距离的整体抽取质量，1.0表示完全匹配 |
-| `table_extraction` | 表格抽取质量 | 0.0-1.0 | 表格结构和内容抽取准确性 |
-| `formula_extraction` | 公式抽取质量 | 0.0-1.0 | 数学公式识别和抽取准确性 |
+| `overall` | 综合得分 | 0.0-1.0 | 所有指标的平均值，反映整体抽取质量 |
+| `text_edit` | 文本编辑距离 | 0.0-1.0 | 衡量文本内容差异的指标，基于编辑距离计算 |
+| `code_edit` | 代码编辑距离 | 0.0-1.0 | 衡量代码内容差异的指标，基于编辑距离计算 |
+| `table_TEDS` | 表格编辑距离 | 0.0-1.0 | 表格结构和内容抽取准确性，使用TEDS算法 |
+| `table_edit` | 表格编辑距离 | 0.0-1.0 | 衡量表格内容差异的指标，基于编辑距离计算 |
+| `formula_edit` | 公式编辑距离 | 0.0-1.0 | 衡量公式内容差异的指标，基于编辑距离计算，包括行内和行间公式 |
 
-#### CSV榜单字段说明
 
-评测完成后会生成CSV格式的榜单文件，包含以下字段：
+### 🏗️ **系统架构**
 
-| CSV列名 | 中文名称 | 说明 |
-|---------|----------|------|
-| `extractor` | 抽取器名称 | 被评测的抽取器标识 |
-| `total_samples` | 总样本数 | 评测的样本总数 |
-| `success_rate` | 成功率 | 成功处理的样本比例 (0.0-1.0) |
-| `overall` | 综合得分 | 基于编辑距离的整体抽取质量 (越高越好) |
-| `table_extraction` | 表格抽取得分 | 表格处理能力 (越高越好) |
-| `formula_extraction` | 公式抽取得分 | 数学公式处理能力 (越高越好) |
-
-**排序规则**: 榜单按 `overall` 综合得分降序排列，得分越高排名越靠前。
+![WebMainBench Architecture](docs/assets/arch.png)
 
 ### 🔧 **核心模块**
 1. **data 模块**: 评测集文件和结果的读写管理
 2. **extractors 模块**: 各种抽取工具的统一接口
 3. **metrics 模块**: 评测指标的计算实现
 4. **evaluator 模块**: 评测任务的执行和结果输出
+
 
 ## 快速开始
 
@@ -86,7 +73,7 @@ print(f"Overall Score: {result.overall_metrics['overall']:.4f}")
 ```jsonl
 {
   "track_id": "0b7f2636-d35f-40bf-9b7f-94be4bcbb396",
-  "html": "<html><body><h1 cc-select="true">这是标题</h1></body></html>",   # 人工标注带cc-select="true" 属性
+  "html": "<html><body><h1 cc-select=\"true\">这是标题</h1></body></html>",   # 人工标注带cc-select="true" 属性
   "groundtruth_content": "# 标题\n\n正文内容",
   "groundtruth_content_list": [
       {"type": "heading", "content": "标题", "level": 1},
@@ -120,7 +107,7 @@ print(f"Overall Score: {result.overall_metrics['overall']:.4f}")
 
 ```python
 # 对比多个抽取器
-extractors = ["llm-webkit", "unstructured", "jina"]
+extractors = ["llm-webkit", "jina-ai"]
 results = evaluator.compare_extractors(dataset, extractors)
 
 for name, result in results.items():
