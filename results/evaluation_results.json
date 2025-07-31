@@ -2,7 +2,7 @@
   "metadata": {
     "dataset_name": "sample_dataset",
     "extractor_name": "mock",
-    "timestamp": "2025-07-30T10:05:54.322334",
+    "timestamp": "2025-07-31T14:29:43.477342",
     "total_samples": 2
   },
   "overall_metrics": {
@@ -17,7 +17,7 @@
     {
       "sample_id": "sample-001-programming-tutorial",
       "extraction_success": true,
-      "extraction_time": 3.0994415283203125e-06,
+      "extraction_time": 4.0531158447265625e-06,
       "metrics": {
         "code_edit": {
           "score": 1.0,
@@ -113,7 +113,7 @@
     {
       "sample_id": "sample-002-math-formulas",
       "extraction_success": true,
-      "extraction_time": 2.1457672119140625e-06,
+      "extraction_time": 1.9073486328125e-06,
       "metrics": {
         "code_edit": {
           "score": 1.0,

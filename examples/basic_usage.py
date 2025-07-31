@@ -383,12 +383,12 @@ def demo_basic_evaluation():
     results_dir.mkdir(exist_ok=True)
     
     results_path = results_dir / "evaluation_results.json"
-    DataSaver.save_evaluation_results(result.to_dict(), results_path)
+    DataSaver.save_evaluation_results(result, results_path)
     print(f"\n结果已保存到: {results_path}")
     
     # 10. 生成报告
     report_path = results_dir / "evaluation_report.csv"
-    DataSaver.save_summary_report(result.to_dict(), report_path)
+    DataSaver.save_summary_report(result, report_path)
     print(f"报告已保存到: {report_path}")
 
 
@@ -458,10 +458,251 @@ def demo_extractor_comparison():
     print(f"\n📊 榜单已保存到: {leaderboard_path}")
 
 
+def demo_llm_webkit_evaluation():
+    """演示LLM-WebKit抽取器的6项指标评测"""
+    
+    print("=== LLM-WebKit Extractor 6项指标评测示例 ===\n")
+    
+    # 设置日志
+    setup_logging(level="INFO")
+    
+    # 1. 创建包含各种内容类型的测试数据集
+    print("1. 创建包含多种内容类型的测试数据集...")
+    
+    samples = []
+    
+    # 样本1: 包含文本和代码
+    samples.append(DataSample(
+        id="text_code_sample",
+        html="""
+        <html>
+        <body>
+            <h1>Python编程示例</h1>
+            <p>这是一段关于Python编程的介绍文本。</p>
+            <pre><code>
+def hello_world():
+    print("Hello, World!")
+    return True
+            </code></pre>
+            <p>以上代码展示了一个简单的Python函数。</p>
+        </body>
+        </html>
+        """,
+        groundtruth_content="""# Python编程示例
+
+这是一段关于Python编程的介绍文本。
+
+```python
+def hello_world():
+    print("Hello, World!")
+    return True
+```
+
+以上代码展示了一个简单的Python函数。""",
+        groundtruth_content_list=[
+            {"type": "heading", "content": "Python编程示例", "level": 1},
+            {"type": "text", "content": "这是一段关于Python编程的介绍文本。"},
+            {"type": "code", "content": "def hello_world():\n    print(\"Hello, World!\")\n    return True", "language": "python"},
+            {"type": "text", "content": "以上代码展示了一个简单的Python函数。"}
+        ]
+    ))
+    
+    # 样本2: 包含表格
+    samples.append(DataSample(
+        id="table_sample",
+        html="""
+        <html>
+        <body>
+            <h2>销售数据统计</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>产品</th>
+                        <th>销量</th>
+                        <th>收入</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>产品A</td>
+                        <td>100</td>
+                        <td>1000</td>
+                    </tr>
+                    <tr>
+                        <td>产品B</td>
+                        <td>200</td>
+                        <td>3000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </body>
+        </html>
+        """,
+        groundtruth_content="""## 销售数据统计
+
+| 产品 | 销量 | 收入 |
+|------|------|------|
+| 产品A | 100 | 1000 |
+| 产品B | 200 | 3000 |""",
+        groundtruth_content_list=[
+            {"type": "heading", "content": "销售数据统计", "level": 2},
+            {"type": "table", "content": "| 产品 | 销量 | 收入 |\n|------|------|------|\n| 产品A | 100 | 1000 |\n| 产品B | 200 | 3000 |"}
+        ]
+    ))
+    
+    # 样本3: 包含公式
+    samples.append(DataSample(
+        id="formula_sample",
+        html="""
+        <html>
+        <body>
+            <h2>数学公式示例</h2>
+            <p>这是一个行内公式: $E = mc^2$</p>
+            <p>这是一个行间公式:</p>
+            <div>$$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$</div>
+        </body>
+        </html>
+        """,
+        groundtruth_content="""## 数学公式示例
+
+这是一个行内公式: $E = mc^2$
+
+这是一个行间公式:
+
+$$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$""",
+        groundtruth_content_list=[
+            {"type": "heading", "content": "数学公式示例", "level": 2},
+            {"type": "text", "content": "这是一个行内公式: $E = mc^2$"},
+            {"type": "text", "content": "这是一个行间公式:"},
+            {"type": "formula", "content": "\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}"}
+        ]
+    ))
+    
+    # 创建数据集并添加样本
+    dataset = BenchmarkDataset(name="llm_webkit_test", description="LLM-WebKit 6项指标测试数据集")
+    for sample in samples:
+        dataset.add_sample(sample)
+    
+    print(f"测试数据集包含 {len(dataset)} 个样本")
+    print(f"样本类型: 文本+代码, 表格, 公式\n")
+    
+    # 2. 创建LLM-WebKit抽取器
+    print("2. 创建LLM-WebKit抽取器...")
+    
+    # 显示所有可用的抽取器
+    available_extractors = ExtractorFactory.list_available()
+    print(f"可用的抽取器: {available_extractors}")
+    
+    # 直接创建LLM-WebKit抽取器，设置模型路径
+    config = {
+        "model_path": "/Users/chupei/model/checkpoint-3296"
+    }
+    extractor = ExtractorFactory.create("llm-webkit", config=config)
+    print(f"✅ LLM-WebKit抽取器创建成功，模型路径: {config['model_path']}")
+    
+    print()
+    
+    # 3. 创建评测器并显示所有可用指标
+    print("3. 创建评测器...")
+    evaluator = Evaluator()
+    available_metrics = evaluator.metric_calculator.list_available_metrics()
+    print(f"✅ 可用的评测指标 ({len(available_metrics)}项):")
+    
+    # 按照6项指标分类显示
+    target_metrics = ["overall", "text_edit", "code_edit", "table_edit", "table_TEDS", "formula_edit"]
+    
+    for metric in target_metrics:
+        if metric in available_metrics:
+            print(f"  ✅ {metric}")
+        else:
+            print(f"  ❌ {metric} (未注册)")
+    
+    print()
+    
+    # 4. 运行评测
+    print("4. 开始评测...")
+    print("=" * 60)
+    
+    result = evaluator.evaluate(
+        dataset=dataset,
+        extractor=extractor,
+        max_samples=None  # 评测所有样本
+    )
+    
+    # 5. 显示详细的6项指标结果
+    print("\n5. 📊 6项指标详细评测结果:")
+    print("=" * 60)
+    
+    results_dict = result.to_dict()
+    
+    # 从overall_metrics中提取指标结果
+    metrics = results_dict.get('overall_metrics', {})
+    
+    # 按照指标分类显示
+    print(f"\n🏆 综合指标:")
+    if 'overall' in metrics:
+        print(f"  overall (综合得分): {metrics['overall']:.4f}")
+    else:
+        print("  overall: 未计算")
+    
+    print(f"\n📝 文本相关指标:")
+    if 'text_edit' in metrics:
+        print(f"  text_edit (文本编辑距离): {metrics['text_edit']:.4f}")
+    else:
+        print("  text_edit: 未计算")
+    if 'code_edit' in metrics:
+        print(f"  code_edit (代码编辑距离): {metrics['code_edit']:.4f}")
+    else:
+        print("  code_edit: 未计算")
+    
+    print(f"\n📊 表格相关指标:")
+    if 'table_edit' in metrics:
+        print(f"  table_edit (表格编辑距离): {metrics['table_edit']:.4f}")
+    else:
+        print("  table_edit: 未计算")
+    if 'table_TEDS' in metrics:
+        print(f"  table_TEDS (表格结构相似度): {metrics['table_TEDS']:.4f}")
+    else:
+        print("  table_TEDS: 未计算")
+    
+    print(f"\n🧮 公式相关指标:")
+    if 'formula_edit' in metrics:
+        print(f"  formula_edit (公式编辑距离): {metrics['formula_edit']:.4f}")
+    else:
+        print("  formula_edit: 未计算")
+    
+    print(f"\n📈 详细统计:")
+    print(f"  总样本数: {len(dataset)}")
+    success_count = len([s for s in results_dict.get('sample_results', []) if s.get('extraction_success', False)])
+    failure_count = len(dataset) - success_count
+    print(f"  成功样本数: {success_count}")
+    print(f"  失败样本数: {failure_count}")
+    
+    # 6. 保存结果到文件
+    print("\n" + "=" * 60)
+    print("6. 保存评测结果...")
+    
+    results_dir = Path("results")
+    results_dir.mkdir(exist_ok=True)
+    
+    # 保存详细结果
+    results_path = results_dir / "llm_webkit_evaluation_results.json"
+    DataSaver.save_evaluation_results(result, results_path)  # 直接传递result对象
+    print(f"✅ 详细结果已保存到: {results_path}")
+    
+    # 生成CSV报告
+    report_path = results_dir / "llm_webkit_evaluation_report.csv"
+    DataSaver.save_summary_report(result, report_path)  # 直接传递result对象
+    print(f"✅ CSV报告已保存到: {report_path}")
+    
+    print("\n" + "=" * 60)
+    print("✅ LLM-WebKit 6项指标评测完成！")
+
+
 if __name__ == "__main__":
     try:
         demo_basic_evaluation()
-        # demo_extractor_comparison()
+        # demo_llm_webkit_evaluation()  # 使用新的LLM-WebKit评测示例
         print("\n✅ 示例运行完成！")
         
     except Exception as e:
