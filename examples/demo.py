@@ -1,7 +1,7 @@
 from webmainbench import DataLoader, Evaluator, ExtractorFactory
 
 # 1. 加载评测数据集
-dataset = DataLoader.load_jsonl("../data/WebMainBench_v1_WebMainBench_dataset_0526.jsonl")
+dataset = DataLoader.load_jsonl("../data/sample_dataset.jsonl")
 
 # 2. 创建抽取器
 extractor = ExtractorFactory.create("trafilatura")
