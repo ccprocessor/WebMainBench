@@ -37,42 +37,9 @@ class FormulaEditMetric(EditDistanceMetric):
     
     def _extract_formula_content(self, text: str, content_list: List[Dict[str, Any]] = None) -> str:
         """从文本和content_list中提取公式内容"""
-        formula_parts = []
-        
-        # 优先从content_list中递归提取
-        if content_list:
-            formula_parts = self._extract_formulas_from_content_list(content_list)
-            
-            # 如果content_list中有公式，直接返回
-            if formula_parts:
-                return '\n'.join(formula_parts)
-        
-        # 只有当content_list中没有公式时，才从文本中提取（使用与_extract_formulas一致的逻辑）
-        if text:
-            # 使用增强的公式提取模式
-            latex_patterns = [
-                r'\$\$([^$]+)\$\$',  # Display math
-                r'(?<!\$)\$([^$\n]+)\$(?!\$)',  # Inline math (improved)
-                r'\\begin\{equation\*?\}(.*?)\\end\{equation\*?\}',  # Equation environment
-                r'\\begin\{align\*?\}(.*?)\\end\{align\*?\}',        # Align environment
-                r'\\begin\{gather\*?\}(.*?)\\end\{gather\*?\}',      # Gather environment
-                r'\\begin\{eqnarray\*?\}(.*?)\\end\{eqnarray\*?\}',  # Eqnarray environment
-                r'\\begin\{multline\*?\}(.*?)\\end\{multline\*?\}',  # Multline environment
-                r'\\begin\{split\}(.*?)\\end\{split\}',              # Split environment
-            ]
-            
-            for pattern in latex_patterns:
-                matches = re.findall(pattern, text, re.DOTALL)
-                formula_parts.extend(matches)
-        
-        # Clean and filter formulas before joining
-        cleaned_formulas = []
-        for formula in formula_parts:
-            formula = formula.strip()
-            if formula and len(formula) > 1:
-                cleaned_formulas.append(formula)
-        
-        return '\n'.join(cleaned_formulas)
+        # 使用统一的内容分割方法
+        content_parts = self.split_content(text, content_list)
+        return content_parts.get('formula', '')
     
     def _extract_formulas_from_content_list(self, content_list: List[Dict[str, Any]]) -> List[str]:
         """递归从content_list中提取公式内容"""

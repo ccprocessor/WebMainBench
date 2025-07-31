@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Dict, Any, List, Optional, Union
 import traceback
+import re
 
 
 @dataclass
@@ -120,6 +121,181 @@ class BaseMetric(ABC):
             result = self.calculate(pred, gt, **kwargs)
             results.append(result)
         return results
+    
+    @staticmethod
+    def split_content(text: str, content_list: List[Dict[str, Any]] = None) -> Dict[str, str]:
+        """
+        统一的内容分割方法，将文本分为代码、公式、表格和剩余文本4个部分。
+        
+        Args:
+            text: 原始markdown文本
+            content_list: 结构化内容列表（来自llm-webkit等）
+            
+        Returns:
+            Dict with keys: 'code', 'formula', 'table', 'text'
+        """
+        # 优先从content_list中提取
+        if content_list:
+            extracted_content = BaseMetric._extract_from_content_list(content_list)
+            if any(extracted_content.values()):
+                return extracted_content
+        
+        # 从markdown文本中提取
+        return BaseMetric._extract_from_markdown(text or "")
+    
+    @staticmethod
+    def _extract_from_content_list(content_list: List[Dict[str, Any]]) -> Dict[str, str]:
+        """从content_list中递归提取各种类型的内容"""
+        extracted = {
+            'code': [],
+            'formula': [],  
+            'table': [],
+            'text': []
+        }
+        
+        def _recursive_extract(items):
+            if not isinstance(items, list):
+                return
+            
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                
+                item_type = item.get('type', '').lower()
+                content = item.get('content', '').strip()
+                
+                # 根据类型分类内容
+                if item_type in ['code', 'code_block', 'inline_code']:
+                    if content:
+                        extracted['code'].append(content)
+                elif item_type in ['formula', 'math', 'equation', 'latex']:
+                    if content:
+                        extracted['formula'].append(content)
+                elif item_type in ['table', 'table_content', 'html_table', 'table_row', 'table_cell']:
+                    if content:
+                        extracted['table'].append(content)
+                elif item_type in ['text', 'paragraph', 'heading']:
+                    if content:
+                        extracted['text'].append(content)
+                
+                # 递归处理子元素
+                for child_key in ['children', 'items', 'content_list']:
+                    if child_key in item and isinstance(item[child_key], list):
+                        _recursive_extract(item[child_key])
+        
+        _recursive_extract(content_list)
+        
+        # 将列表转换为字符串
+        return {
+            'code': '\n'.join(extracted['code']),
+            'formula': '\n'.join(extracted['formula']),
+            'table': '\n'.join(extracted['table']),
+            'text': '\n'.join(extracted['text'])
+        }
+    
+    @staticmethod 
+    def _extract_from_markdown(text: str) -> Dict[str, str]:
+        """从markdown文本中提取各种类型的内容"""
+        if not text:
+            return {'code': '', 'formula': '', 'table': '', 'text': ''}
+        
+        # 收集所有需要移除的内容片段
+        extracted_segments = []
+        
+        # 提取代码
+        code_parts = []
+        # 代码块 ```code```
+        for match in re.finditer(r'```[\s\S]*?```', text):
+            code_block = match.group(0)
+            extracted_segments.append(code_block)
+            code_parts.append(code_block.strip('`').strip())
+        
+        # 行内代码 `code`
+        for match in re.finditer(r'`([^`]+)`', text):
+            inline_code_full = match.group(0)  # 包含反引号的完整匹配
+            inline_code_content = match.group(1)  # 只是内容
+            extracted_segments.append(inline_code_full)
+            code_parts.append(inline_code_content)
+        
+        # 提取公式
+        formula_parts = []
+        # 统一的公式提取模式
+        latex_patterns = [
+            r'(?<!\\)\$\$([^$]+)\$\$(?!\\)',  # Display math (not escaped)
+            r'(?<!\\)\$([^$\n]+)\$(?![\\\$])',  # Inline math (not escaped)
+            # r'\\begin\{equation\*?\}(.*?)\\end\{equation\*?\}',  # Equation environment
+            # r'\\begin\{align\*?\}(.*?)\\end\{align\*?\}',        # Align environment
+            # r'\\begin\{gather\*?\}(.*?)\\end\{gather\*?\}',      # Gather environment
+            # r'\\begin\{eqnarray\*?\}(.*?)\\end\{eqnarray\*?\}',  # Eqnarray environment
+            # r'\\begin\{multline\*?\}(.*?)\\end\{multline\*?\}',  # Multline environment
+            # r'\\begin\{split\}(.*?)\\end\{split\}',              # Split environment
+        ]
+        
+        for pattern in latex_patterns:
+            for match in re.finditer(pattern, text, re.DOTALL):
+                formula_full = match.group(0)  # 完整匹配（包含$符号）
+                formula_content = match.group(1)  # 只是公式内容
+                extracted_segments.append(formula_full)
+                if formula_content.strip():
+                    formula_parts.append(formula_content.strip())
+        
+        # 提取表格
+        table_parts = []
+        
+        # 1. 提取HTML表格
+        html_table_pattern = r'<table[^>]*>.*?</table>'
+        for match in re.finditer(html_table_pattern, text, re.DOTALL | re.IGNORECASE):
+            html_table = match.group(0)
+            extracted_segments.append(html_table)
+            table_parts.append(html_table)
+        
+        # 2. 提取Markdown表格
+        lines = text.split('\n')
+        table_lines = []
+        in_markdown_table = False
+        
+        for line in lines:
+            if '|' in line and line.strip():
+                table_lines.append(line)
+                in_markdown_table = True
+            elif in_markdown_table and line.strip() == '':
+                # Markdown表格结束（空行）
+                if table_lines:
+                    md_table = '\n'.join(table_lines)
+                    extracted_segments.append(md_table)
+                    table_parts.append(md_table)
+                    table_lines = []
+                in_markdown_table = False
+            elif in_markdown_table:
+                # 表格内的非表格行，Markdown表格结束
+                if table_lines:
+                    md_table = '\n'.join(table_lines)
+                    extracted_segments.append(md_table)
+                    table_parts.append(md_table)
+                    table_lines = []
+                in_markdown_table = False
+        
+        # 处理文档末尾的Markdown表格
+        if table_lines:
+            md_table = '\n'.join(table_lines)
+            extracted_segments.append(md_table)
+            table_parts.append(md_table)
+        
+        # 提取剩余文本（移除所有已提取的内容片段）
+        clean_text = text
+        for segment in extracted_segments:
+            clean_text = clean_text.replace(segment, '', 1)
+        
+        # 清理多余的空行
+        clean_text = re.sub(r'\n\s*\n', '\n\n', clean_text)
+        clean_text = clean_text.strip()
+        
+        return {
+            'code': '\n'.join(code_parts),
+            'formula': '\n'.join(formula_parts),
+            'table': '\n'.join(table_parts),
+            'text': clean_text
+        }
     
     def aggregate_results(self, results: List[MetricResult]) -> MetricResult:
         """
