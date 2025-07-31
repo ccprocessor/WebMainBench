@@ -146,6 +146,7 @@ class DataSaver:
             
             row = {
                 'extractor': metadata.get('extractor_name', 'unknown'),
+                'dataset': metadata.get('dataset_name', 'unknown'),
                 'total_samples': metadata.get('total_samples', 0),
                 'success_rate': error_analysis.get('success_rate', 0.0)
             }
@@ -166,7 +167,7 @@ class DataSaver:
         # Write CSV file
         if csv_data:
             # Define field order: basic info first, then overall, then other metrics alphabetically
-            basic_fields = ['extractor', 'total_samples', 'success_rate']
+            basic_fields = ['extractor', 'dataset', 'total_samples', 'success_rate']
             
             # Get all metric fields from the data
             all_fields = set()
