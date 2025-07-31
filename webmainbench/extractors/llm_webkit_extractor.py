@@ -661,7 +661,7 @@ Output format should be a JSON-formatted string representing a dictionary where 
             # 创建结果对象
             result = ExtractionResult(
                 content=main_content,
-                content_list=content_list,
+                # content_list=content_list,
                 title=self._extract_title(html),
                 language=self._detect_language(main_content),
                 confidence_score=confidence,
