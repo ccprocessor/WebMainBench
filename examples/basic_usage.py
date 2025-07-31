@@ -290,7 +290,7 @@ Master定理：$T(n) = aT(n/b) + f(n)$
     return dataset
 
 
-def demo_basic_evaluation():
+def demo_basic_mock_evaluation():
     """演示基本评测流程"""
     
     print("=== WebMainBench 基本使用示例 ===\n")
@@ -382,12 +382,12 @@ def demo_basic_evaluation():
     results_dir = Path("results")
     results_dir.mkdir(exist_ok=True)
     
-    results_path = results_dir / "evaluation_results.json"
+    results_path = results_dir / "mock_evaluation_results.json"
     DataSaver.save_evaluation_results(result, results_path)
     print(f"\n结果已保存到: {results_path}")
     
     # 10. 生成报告
-    report_path = results_dir / "evaluation_report.csv"
+    report_path = results_dir / "mock_evaluation_report.csv"
     DataSaver.save_summary_report(result, report_path)
     print(f"报告已保存到: {report_path}")
 
@@ -701,8 +701,8 @@ $$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$""",
 
 if __name__ == "__main__":
     try:
-        demo_basic_evaluation()
-        # demo_llm_webkit_evaluation()  # 使用新的LLM-WebKit评测示例
+        demo_basic_mock_evaluation()
+        demo_llm_webkit_evaluation()  # 使用LLM-WebKit评测示例
         print("\n✅ 示例运行完成！")
         
     except Exception as e:

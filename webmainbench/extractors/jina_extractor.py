@@ -79,7 +79,7 @@ class JinaExtractor(BaseExtractor):
             
             return ExtractionResult(
                 content=content,
-                content_list=content_list,
+                # content_list=content_list,
                 title=title,
                 # confidence_score=self._calculate_confidence(content, content_list),
                 success=True

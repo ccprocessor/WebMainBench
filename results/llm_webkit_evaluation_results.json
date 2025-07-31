@@ -2,7 +2,7 @@
   "metadata": {
     "dataset_name": "llm_webkit_test",
     "extractor_name": "llm-webkit",
-    "timestamp": "2025-07-31T13:52:12.948959",
+    "timestamp": "2025-07-31T14:59:59.169188",
     "total_samples": 3
   },
   "overall_metrics": {
@@ -17,7 +17,7 @@
     {
       "sample_id": "text_code_sample",
       "extraction_success": true,
-      "extraction_time": 3.6406631469726562,
+      "extraction_time": 3.614135980606079,
       "metrics": {
         "code_edit": {
           "score": 0.488,
@@ -113,7 +113,7 @@
     {
       "sample_id": "table_sample",
       "extraction_success": true,
-      "extraction_time": 1.6590700149536133,
+      "extraction_time": 1.6187489032745361,
       "metrics": {
         "code_edit": {
           "score": 1.0,
@@ -209,7 +209,7 @@
     {
       "sample_id": "formula_sample",
       "extraction_success": true,
-      "extraction_time": 1.5354089736938477,
+      "extraction_time": 1.5252501964569092,
       "metrics": {
         "code_edit": {
           "score": 1.0,
