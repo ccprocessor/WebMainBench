@@ -409,7 +409,7 @@ def demo_extractor_comparison():
         def _extract_content(self, html, url=None):
             return ExtractionResult(
                 content="抽取器A的结果",
-                content_list=[{"type": "paragraph", "content": "抽取器A的结果"}],
+                # content_list=[{"type": "paragraph", "content": "抽取器A的结果"}],
                 success=True,
                 confidence_score=0.9
             )
@@ -420,7 +420,7 @@ def demo_extractor_comparison():
         def _extract_content(self, html, url=None):
             return ExtractionResult(
                 content="抽取器B的结果",
-                content_list=[{"type": "paragraph", "content": "抽取器B的结果"}],
+                # content_list=[{"type": "paragraph", "content": "抽取器B的结果"}],
                 success=True,
                 confidence_score=0.8
             )
@@ -703,6 +703,7 @@ if __name__ == "__main__":
     try:
         demo_basic_mock_evaluation()
         demo_llm_webkit_evaluation()  # 使用LLM-WebKit评测示例
+        demo_extractor_comparison()
         print("\n✅ 示例运行完成！")
         
     except Exception as e:
