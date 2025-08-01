@@ -458,6 +458,246 @@ def demo_extractor_comparison():
     print(f"\n📊 榜单已保存到: {leaderboard_path}")
 
 
+def demo_trafilatura_evaluation():
+    """演示基本评测流程"""
+
+    print("=== WebMainBench 基本使用示例 ===\n")
+
+    # 设置日志
+    setup_logging(level="INFO")
+
+    # # 1. 创建或加载数据集
+    # print("1. 创建示例数据集...")
+    # dataset = create_sample_dataset()
+    # print(f"数据集包含 {len(dataset)} 个样本")
+    # print(f"数据集统计: {dataset.get_statistics()}\n")
+    #
+    # # 2. 保存数据集到文件
+    # data_dir = Path("data")
+    # data_dir.mkdir(exist_ok=True)
+    #
+    # dataset_path = data_dir / "sample_dataset.jsonl"
+    # DataSaver.save_jsonl(dataset, dataset_path, include_results=False)
+    # print(f"数据集已保存到: {dataset_path}\n")
+    #
+    # # 3. 重新加载数据集
+    # print("2. 重新加载数据集...")
+    # loaded_dataset = DataLoader.load_jsonl(dataset_path)
+    # print(f"加载的数据集包含 {len(loaded_dataset)} 个样本\n")
+
+    # 1. 加载本地JSONL数据集
+    print("1. 加载本地数据集...")
+    # 请将此处的文件路径替换为你的本地JSONL文件路径
+    dataset_path = Path("../../update_0603.jsonl")  # 本地JSONL文件路径
+    loaded_dataset = DataLoader.load_jsonl(dataset_path)
+    print(f"加载的数据集包含 {len(loaded_dataset)} 个样本")
+    print(f"数据集统计: {loaded_dataset.get_statistics()}\n")
+
+    # 4. 列出可用的抽取器
+    print("3. 可用的抽取器:")
+    available_extractors = ExtractorFactory.list_available()
+    for extractor_name in available_extractors:
+        print(f"  - {extractor_name}")
+    print()
+
+    # 5. 创建评测器
+    print("4. 创建评测器...")
+    evaluator = Evaluator()
+    print(f"可用的评测指标: {evaluator.metric_calculator.list_available_metrics()}\n")
+
+    # 6. 创建一个抽取器进行演示
+    print("5. 创建抽取器...")
+
+    mock_extractor = ExtractorFactory.create("trafilatura")
+    print("抽取器已创建\n")
+
+    # 7. 运行评测
+    print("6. 运行评测...")
+    result = evaluator.evaluate(
+        dataset=loaded_dataset,
+        extractor=mock_extractor,
+        max_samples=3000  # 限制样本数量用于演示
+    )
+
+    # 8. 显示结果
+    print("\n7. 评测结果:")
+    print("=" * 50)
+    formatted_results = format_results(result.to_dict())
+    print(formatted_results)
+
+    # 9. 保存结果
+    results_dir = Path("results")
+    results_dir.mkdir(exist_ok=True)
+
+    results_path = results_dir / "trafilatura_evaluation_0603_results.json"
+    DataSaver.save_evaluation_results(result, results_path)
+    print(f"\n结果已保存到: {results_path}")
+
+    # 10. 生成报告
+    report_path = results_dir / "trafilatura_evaluation_0603_report.csv"
+    DataSaver.save_summary_report(result, report_path)
+    print(f"报告已保存到: {report_path}")
+
+def demo_resiliparse_evaluation():
+    """演示基本评测流程"""
+
+    print("=== WebMainBench 基本使用示例 ===\n")
+
+    # 设置日志
+    setup_logging(level="INFO")
+
+    # # 1. 创建或加载数据集
+    # print("1. 创建示例数据集...")
+    # dataset = create_sample_dataset()
+    # print(f"数据集包含 {len(dataset)} 个样本")
+    # print(f"数据集统计: {dataset.get_statistics()}\n")
+    #
+    # # 2. 保存数据集到文件
+    # data_dir = Path("data")
+    # data_dir.mkdir(exist_ok=True)
+    #
+    # dataset_path = data_dir / "sample_dataset.jsonl"
+    # DataSaver.save_jsonl(dataset, dataset_path, include_results=False)
+    # print(f"数据集已保存到: {dataset_path}\n")
+    #
+    # # 3. 重新加载数据集
+    # print("2. 重新加载数据集...")
+    # loaded_dataset = DataLoader.load_jsonl(dataset_path)
+    # print(f"加载的数据集包含 {len(loaded_dataset)} 个样本\n")
+
+    # 1. 加载本地JSONL数据集
+    print("1. 加载本地数据集...")
+    # 请将此处的文件路径替换为你的本地JSONL文件路径
+    dataset_path = Path("../../update_0603.jsonl")  # 本地JSONL文件路径
+    loaded_dataset = DataLoader.load_jsonl(dataset_path)
+    print(f"加载的数据集包含 {len(loaded_dataset)} 个样本")
+    print(f"数据集统计: {loaded_dataset.get_statistics()}\n")
+
+    # 4. 列出可用的抽取器
+    print("3. 可用的抽取器:")
+    available_extractors = ExtractorFactory.list_available()
+    for extractor_name in available_extractors:
+        print(f"  - {extractor_name}")
+    print()
+
+    # 5. 创建评测器
+    print("4. 创建评测器...")
+    evaluator = Evaluator()
+    print(f"可用的评测指标: {evaluator.metric_calculator.list_available_metrics()}\n")
+
+    # 6. 创建一个抽取器进行演示
+    print("5. 创建抽取器...")
+
+    mock_extractor = ExtractorFactory.create("resiliparse")
+    print("抽取器已创建\n")
+
+    # 7. 运行评测
+    print("6. 运行评测...")
+    result = evaluator.evaluate(
+        dataset=loaded_dataset,
+        extractor=mock_extractor,
+        max_samples=3000  # 限制样本数量用于演示
+    )
+
+    # 8. 显示结果
+    print("\n7. 评测结果:")
+    print("=" * 50)
+    formatted_results = format_results(result.to_dict())
+    print(formatted_results)
+
+    # 9. 保存结果
+    results_dir = Path("results")
+    results_dir.mkdir(exist_ok=True)
+
+    results_path = results_dir / "resiliparse_evaluation_0603_results.json"
+    DataSaver.save_evaluation_results(result, results_path)
+    print(f"\n结果已保存到: {results_path}")
+
+    # 10. 生成报告
+    report_path = results_dir / "resiliparse_evaluation_0603_report.csv"
+    DataSaver.save_summary_report(result, report_path)
+    print(f"报告已保存到: {report_path}")
+
+def demo_magic_html_evaluation():
+    """演示基本评测流程"""
+
+    print("=== WebMainBench 基本使用示例 ===\n")
+
+    # 设置日志
+    setup_logging(level="INFO")
+
+    # # 1. 创建或加载数据集
+    # print("1. 创建示例数据集...")
+    # dataset = create_sample_dataset()
+    # print(f"数据集包含 {len(dataset)} 个样本")
+    # print(f"数据集统计: {dataset.get_statistics()}\n")
+    #
+    # # 2. 保存数据集到文件
+    # data_dir = Path("data")
+    # data_dir.mkdir(exist_ok=True)
+    #
+    # dataset_path = data_dir / "sample_dataset.jsonl"
+    # DataSaver.save_jsonl(dataset, dataset_path, include_results=False)
+    # print(f"数据集已保存到: {dataset_path}\n")
+    #
+    # # 3. 重新加载数据集
+    # print("2. 重新加载数据集...")
+    # loaded_dataset = DataLoader.load_jsonl(dataset_path)
+    # print(f"加载的数据集包含 {len(loaded_dataset)} 个样本\n")
+
+    # 1. 加载本地JSONL数据集
+    print("1. 加载本地数据集...")
+    # 请将此处的文件路径替换为你的本地JSONL文件路径
+    dataset_path = Path("../../update_0603.jsonl")  # 本地JSONL文件路径
+    loaded_dataset = DataLoader.load_jsonl(dataset_path)
+    print(f"加载的数据集包含 {len(loaded_dataset)} 个样本")
+    print(f"数据集统计: {loaded_dataset.get_statistics()}\n")
+
+    # 4. 列出可用的抽取器
+    print("3. 可用的抽取器:")
+    available_extractors = ExtractorFactory.list_available()
+    for extractor_name in available_extractors:
+        print(f"  - {extractor_name}")
+    print()
+
+    # 5. 创建评测器
+    print("4. 创建评测器...")
+    evaluator = Evaluator()
+    print(f"可用的评测指标: {evaluator.metric_calculator.list_available_metrics()}\n")
+
+    # 6. 创建一个抽取器进行演示
+    print("5. 创建抽取器...")
+
+    mock_extractor = ExtractorFactory.create("magic-html")
+    print("抽取器已创建\n")
+
+    # 7. 运行评测
+    print("6. 运行评测...")
+    result = evaluator.evaluate(
+        dataset=loaded_dataset,
+        extractor=mock_extractor,
+        max_samples=3000  # 限制样本数量用于演示
+    )
+
+    # 8. 显示结果
+    print("\n7. 评测结果:")
+    print("=" * 50)
+    formatted_results = format_results(result.to_dict())
+    print(formatted_results)
+
+    # 9. 保存结果
+    results_dir = Path("results")
+    results_dir.mkdir(exist_ok=True)
+
+    results_path = results_dir / "magic-html_evaluation_0603_results.json"
+    DataSaver.save_evaluation_results(result, results_path)
+    print(f"\n结果已保存到: {results_path}")
+
+    # 10. 生成报告
+    report_path = results_dir / "magic-html_evaluation_0603_report.csv"
+    DataSaver.save_summary_report(result, report_path)
+    print(f"报告已保存到: {report_path}")
+
 def demo_llm_webkit_evaluation():
     """演示LLM-WebKit抽取器的6项指标评测"""
     
@@ -701,9 +941,11 @@ $$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$""",
 
 if __name__ == "__main__":
     try:
-        demo_basic_mock_evaluation()
-        demo_llm_webkit_evaluation()  # 使用LLM-WebKit评测示例
-        demo_extractor_comparison()
+        demo_trafilatura_evaluation()
+        demo_resiliparse_evaluation()
+        demo_magic_html_evaluation()
+        # demo_llm_webkit_evaluation()  # 使用LLM-WebKit评测示例
+        # demo_extractor_comparison()
         print("\n✅ 示例运行完成！")
         
     except Exception as e:
