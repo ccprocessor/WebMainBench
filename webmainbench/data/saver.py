@@ -154,7 +154,7 @@ class DataSaver:
             # Add all available metrics from overall_metrics
             if 'overall_metrics' in result:
                 for metric_name, value in result['overall_metrics'].items():
-                    row[metric_name] = round(value, 4) if isinstance(value, (int, float)) else value
+                        row[metric_name] = round(value, 4) if isinstance(value, (int, float)) else value
             
             csv_data.append(row)
         
@@ -264,7 +264,110 @@ class DataSaver:
             for item in data_list:
                 json.dump(item, f, ensure_ascii=False)
                 f.write('\n')
+    
+    @staticmethod
+    def append_intermediate_results(results: List[Dict[str, Any]], 
+                                  file_path: Union[str, Path]) -> None:
+        """
+        追加保存中间结果，用于批处理时释放内存。
+        
+        Args:
+            results: 要保存的结果列表
+            file_path: 输出文件路径
+        """
+        file_path = Path(file_path)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # 追加模式写入JSONL
+        with open(file_path, 'a', encoding='utf-8') as f:
+            for result in results:
+                json.dump(result, f, ensure_ascii=False)
+                f.write('\n')
+    
+    @staticmethod
+    def save_streaming_results(results_iterator,
+                             file_path: Union[str, Path],
+                             batch_size: int = 100) -> int:
+        """
+        流式保存评测结果，适用于大数据集处理。
+        
+        Args:
+            results_iterator: 结果迭代器
+            file_path: 输出文件路径
+            batch_size: 批次保存大小
+            
+        Returns:
+            int: 保存的结果数量
+        """
+        file_path = Path(file_path)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        saved_count = 0
+        batch = []
+        
+        with open(file_path, 'w', encoding='utf-8') as f:
+            for result in results_iterator:
+                batch.append(result)
+                saved_count += 1
+                
+                # 达到批次大小时写入
+                if len(batch) >= batch_size:
+                    for item in batch:
+                        json.dump(item, f, ensure_ascii=False)
+                        f.write('\n')
+                    batch = []
+            
+            # 保存最后一批
+            if batch:
+                for item in batch:
+                    json.dump(item, f, ensure_ascii=False)
+                    f.write('\n')
+        
+        return saved_count
+    
+    @staticmethod
+    def create_streaming_writer(file_path: Union[str, Path]):
+        """
+        创建流式写入器，用于逐个保存结果。
+        
+        Args:
+            file_path: 输出文件路径
+            
+        Returns:
+            StreamingResultWriter: 流式写入器实例
+        """
+        return StreamingResultWriter(file_path)
 
+
+class StreamingResultWriter:
+    """流式结果写入器，用于逐个保存评测结果"""
+    
+    def __init__(self, file_path: Union[str, Path]):
+        self.file_path = Path(file_path)
+        self.file_path.parent.mkdir(parents=True, exist_ok=True)
+        self.file_handle = None
+        self.count = 0
+    
+    def __enter__(self):
+        self.file_handle = open(self.file_path, 'w', encoding='utf-8')
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.file_handle:
+            self.file_handle.close()
+    
+    def write_result(self, result: Dict[str, Any]) -> None:
+        """写入单个结果"""
+        if self.file_handle:
+            json.dump(result, self.file_handle, ensure_ascii=False)
+            self.file_handle.write('\n')
+            self.file_handle.flush()  # 确保立即写入
+            self.count += 1
+    
+    def get_count(self) -> int:
+        """获取已写入的结果数量"""
+        return self.count
+    
     @staticmethod
     def export_for_analysis(dataset: BenchmarkDataset,
                            file_path: Union[str, Path],

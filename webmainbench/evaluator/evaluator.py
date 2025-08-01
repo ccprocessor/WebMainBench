@@ -3,11 +3,13 @@ Main evaluator for WebMainBench.
 """
 
 from dataclasses import dataclass
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional, Union, Iterator
 import time
+import itertools
 from datetime import datetime
+from pathlib import Path
 
-from ..data import BenchmarkDataset, DataSample
+from ..data import BenchmarkDataset, DataSample, DataLoader, DataSaver
 from ..extractors import BaseExtractor, ExtractorFactory
 from ..metrics import MetricCalculator, MetricResult
 
@@ -109,16 +111,23 @@ class Evaluator:
         if isinstance(extractor, str):
             extractor = ExtractorFactory.create(extractor, extractor_config)
         
-        # Filter samples if needed
-        samples_to_evaluate = list(dataset.samples)
+        # Filter samples if needed (避免不必要的副本)
+        samples_iter = dataset.samples
+        
+        # 只有在需要过滤时才创建副本
         if categories:
-            samples_to_evaluate = [
-                s for s in samples_to_evaluate 
+            samples_iter = [
+                s for s in samples_iter 
                 if s.content_type in categories
             ]
         
+        # 如果有max_samples限制，使用itertools.islice避免完整列表
         if max_samples:
-            samples_to_evaluate = samples_to_evaluate[:max_samples]
+            import itertools
+            samples_to_evaluate = list(itertools.islice(samples_iter, max_samples))
+        else:
+            # 如果没有任何过滤，直接使用原始列表避免副本
+            samples_to_evaluate = samples_iter if not categories else samples_iter
         
         # Run evaluation
         sample_results = []
@@ -177,6 +186,125 @@ class Evaluator:
         
         return evaluation_result
     
+    def evaluate_batched(self,
+                        jsonl_file_path: Union[str, Path],
+                        extractor: Union[BaseExtractor, str],
+                        batch_size: int = 50,
+                        extractor_config: Dict[str, Any] = None,
+                        max_samples: Optional[int] = None,
+                        categories: Optional[List[str]] = None,
+                        output_file: Optional[Union[str, Path]] = None) -> EvaluationResult:
+        """
+        分批处理评测，减少内存使用。
+        
+        Args:
+            jsonl_file_path: JSONL数据集文件路径
+            extractor: BaseExtractor实例或名称
+            batch_size: 批处理大小（默认50）
+            extractor_config: 抽取器配置
+            max_samples: 最大样本数限制
+            categories: 特定类别过滤
+            output_file: 可选的结果输出文件（用于大数据集）
+            
+        Returns:
+            EvaluationResult实例
+        """
+        # Create extractor if string name provided
+        if isinstance(extractor, str):
+            extractor = ExtractorFactory.create(extractor, extractor_config)
+        
+        jsonl_file_path = Path(jsonl_file_path)
+        
+        # 统计信息
+        total_samples = 0
+        processed_samples = 0
+        all_sample_results = []
+        all_extraction_errors = []
+        
+        print(f"🔄 开始批处理评测")
+        print(f"   数据集: {jsonl_file_path}")
+        print(f"   批大小: {batch_size}")
+        print(f"   最大样本数: {max_samples or '无限制'}")
+        
+        start_time = time.time()
+        
+        # 使用DataLoader的流式批处理方法
+        for batch_samples in DataLoader.stream_jsonl_batched(
+            file_path=jsonl_file_path,
+            batch_size=batch_size,
+            categories=categories,
+            max_samples=max_samples
+        ):
+            # 处理当前批次
+            batch_results, batch_errors = self._process_batch(batch_samples, extractor)
+            all_sample_results.extend(batch_results)
+            all_extraction_errors.extend(batch_errors)
+            
+            processed_samples += len(batch_samples)
+            total_samples += len(batch_samples)
+            
+            print(f"   已处理: {processed_samples} 样本")
+            
+            # 如果有输出文件，可以立即写入避免内存累积
+            if output_file and len(all_sample_results) > 1000:
+                DataSaver.append_intermediate_results(all_sample_results, output_file)
+                all_sample_results = []  # 清空已保存的结果
+        
+        end_time = time.time()
+        print(f"✅ 批处理评测完成")
+        print(f"   总耗时: {end_time - start_time:.2f}秒")
+        print(f"   处理样本: {processed_samples}")
+        
+        # 聚合结果
+        overall_metrics = self._aggregate_metrics(all_sample_results)
+        # 批处理模式下跳过分类指标（为了节约内存，不保存样本列表）
+        category_metrics = None
+        error_analysis = self._analyze_errors(all_extraction_errors, all_sample_results)
+        
+        evaluation_result = EvaluationResult(
+            dataset_name=jsonl_file_path.stem,
+            extractor_name=extractor.name,
+            timestamp=datetime.now().isoformat(),
+            total_samples=processed_samples,
+            overall_metrics=overall_metrics,
+            sample_results=all_sample_results,
+            category_metrics=category_metrics,
+            error_analysis=error_analysis,
+            extractor_config=extractor.get_config(),
+            metric_config=self.metric_config,
+        )
+        
+        return evaluation_result
+    
+    def _process_batch(self, batch_samples: List[DataSample], extractor: BaseExtractor) -> tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
+        """处理一批样本"""
+        batch_results = []
+        batch_errors = []
+        
+        for sample in batch_samples:
+            try:
+                sample_result = self._evaluate_sample(sample, extractor)
+                batch_results.append(sample_result)
+                
+                # 收集错误信息
+                if not sample_result.get('extraction_success', False):
+                    batch_errors.append({
+                        'sample_id': sample.id,
+                        'error': sample_result.get('extraction_error', 'Unknown error'),
+                        'url': sample.url,
+                    })
+                    
+            except Exception as e:
+                print(f"⚠️  样本 {sample.id} 评测失败: {e}")
+                batch_errors.append({
+                    'sample_id': sample.id,
+                    'error': str(e),
+                    'url': sample.url,
+                })
+        
+        return batch_results, batch_errors
+    
+
     def _evaluate_sample(self, sample: DataSample, extractor: BaseExtractor) -> Dict[str, Any]:
         """Evaluate a single sample."""
         # Extract content
