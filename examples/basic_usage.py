@@ -763,12 +763,140 @@ def demo_dataset_with_extraction():
     print(f"  - {extractor.name}_time: 抽取耗时")
     print(f"  - {extractor.name}_*_score: 各项指标分数")
 
+def demo_some_extraction():
+    """演示保存带有多个抽取器抽取内容的数据集"""
+    print("=== 演示：保存带有多个抽取器抽取内容的数据集 ===")
+
+    from webmainbench import DataLoader, DataSaver, Evaluator, ExtractorFactory
+    from pathlib import Path
+    import time
+
+    # 从文件加载数据集
+    data_dir = Path("../data")
+    dataset_path = data_dir / "sample_dataset.jsonl"
+    # dataset_path = "/home/lulindong/Pycharm_projects/cc/WebMainBench_v1_WebMainBench_dataset_0603.jsonl"
+    # dataset_path = "/Users/chupei/Downloads/WebMainBench_dataset_merge_2549.jsonl"
+
+    print(f"📂 从文件加载数据集: {dataset_path}")
+    dataset = DataLoader.load_jsonl(dataset_path, include_results=False)
+    dataset.name = "WebMainBench_with_multi_extraction"
+    dataset.description = "演示多个抽取器内容保存的测试数据集"
+
+    print(f"📊 加载数据集完成，包含 {len(dataset.samples)} 个样本")
+
+    # 定义要使用的抽取器列表
+    extractors_info = [
+        {"name": "resiliparse", "config": {
+            "main_content": True,
+            "alt_texts": True,
+            "links": False,
+            "list_bullets": True,
+            "preserve_formatting": True
+        }},
+        {"name": "trafilatura", "config": {}},
+        {"name": "magic-html", "config": {}},
+    ]
+
+    results_dir = Path("results")
+    results_dir.mkdir(exist_ok=True)
+
+    # 存储所有抽取器的评测结果和耗时信息
+    all_results = []
+    extractor_performance = []  # 用于记录每个抽取器的性能数据
+
+    # 为每个抽取器运行评测并保存结果
+    for info in extractors_info:
+        extractor_name = info["name"]
+        config = info["config"]
+
+        try:
+            # 创建抽取器
+            extractor = ExtractorFactory.create(extractor_name, config=config)
+            print(f"\n🤖 使用抽取器: {extractor.name}")
+        except Exception as e:
+            print(f"⚠️ {extractor_name}抽取器创建失败: {e}")
+            continue
+
+        # 记录抽取器总耗时
+        start_time = time.time()
+
+        # 运行评测
+        evaluator = Evaluator()
+        result = evaluator.evaluate(dataset, extractor)
+
+        # 计算总耗时
+        total_time = time.time() - start_time
+        avg_time_per_sample = total_time / len(dataset.samples) if dataset.samples else 0
+
+        # 保存性能数据
+        extractor_performance.append({
+            "name": extractor_name,
+            "total_samples": len(dataset.samples),
+            "total_time": total_time,
+            "avg_time_per_sample": avg_time_per_sample
+        })
+
+        # 输出耗时信息
+        print(f"⏱️ {extractor_name} 抽取耗时:")
+        print(f"   总耗时: {total_time:.4f}秒")
+        print(f"   单样本平均耗时: {avg_time_per_sample:.4f}秒")
+        print(f"✅ {extractor_name}评测完成，总体得分: {result.overall_metrics.get('overall', 0):.4f}")
+
+        all_results.append(result)
+
+        # 保存带有当前抽取器内容的数据集
+        enriched_dataset_path = results_dir / f"{dataset.name}_with_{extractor.name}_extraction.jsonl"
+
+        DataSaver.save_dataset_with_extraction(
+            results=result,
+            dataset=dataset,
+            file_path=enriched_dataset_path,
+            extractor_name=extractor.name
+        )
+
+        print(f"💾 已保存带有{extractor.name}抽取内容的数据集到: {enriched_dataset_path}")
+
+        # 保存当前抽取器的评测结果
+        evaluation_results_path = results_dir / f"{dataset.name}_{extractor.name}_evaluation_results.json"
+        DataSaver.save_evaluation_results(result, evaluation_results_path)
+        print(f"📊 已保存{extractor.name}评测结果到: {evaluation_results_path}")
+
+    # 保存所有抽取器的汇总报告
+    if all_results:
+        summary_report_path = results_dir / f"{dataset.name}_multi_extractors_summary_report.csv"
+        DataSaver.save_summary_report(all_results, summary_report_path)
+        print(f"\n📈 已保存所有抽取器的汇总报告到: {summary_report_path}")
+
+    # 显示抽取器性能对比
+    if extractor_performance:
+        print("\n⚡ 抽取器性能对比:")
+        for perf in extractor_performance:
+            print(f"  {perf['name']}:")
+            print(f"    总处理时间: {perf['total_time']:.4f}秒")
+            print(f"    单样本平均时间: {perf['avg_time_per_sample']:.4f}秒")
+            print(f"    处理效率: {1 / perf['avg_time_per_sample']:.2f}样本/秒 (越高越好)")
+
+    # 显示保存的字段信息
+    print("\n📋 保存的新字段包括:")
+    for info in extractors_info:
+        name = info["name"]
+        print(f"  对于{name}:")
+        print(f"    - {name}_content: 抽取的内容")
+        print(f"    - {name}_content_list: 抽取的结构化内容列表")
+        print(f"    - {name}_success: 抽取是否成功")
+        print(f"    - {name}_time: 单个样本抽取耗时(秒)")
+        print(f"    - {name}_*_score: 各项指标分数")
+
+
+
 if __name__ == "__main__":
     try:
-        demo_basic_mock_evaluation()
-        demo_llm_webkit_evaluation()  # 使用LLM-WebKit评测示例
-        demo_extractor_comparison()
-        demo_dataset_with_extraction()  # 演示保存带有抽取内容的数据集
+        # demo_basic_mock_evaluation()
+        # demo_llm_webkit_evaluation()  # 使用LLM-WebKit评测示例
+        # demo_extractor_comparison()
+        # demo_dataset_with_extraction()  # 演示保存带有抽取内容的数据集
+        demo_some_extraction()
+        # demo_lld_workers_extraction()
         print("\n✅ 示例运行完成！")
         
     except Exception as e:
