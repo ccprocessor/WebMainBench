@@ -706,29 +706,54 @@ def demo_dataset_with_extraction():
     from webmainbench import DataLoader, DataSaver, Evaluator, ExtractorFactory
     from pathlib import Path
     
-    # 从文件加载数据集
+    # 配置文件路径
     data_dir = Path("data")
     dataset_path = data_dir / "sample_dataset.jsonl"
     # dataset_path = "/Users/chupei/Downloads/WebMainBench_dataset_merge_2549.jsonl"
     
-    print(f"📂 从文件加载数据集: {dataset_path}")
-    dataset = DataLoader.load_jsonl(dataset_path, include_results=False)
-    dataset.name = "WebMainBench_with_extraction"
-    dataset.description = "演示抽取内容保存的测试数据集"
+    print(f"📂 数据集文件: {dataset_path}")
     
-    print(f"📊 加载数据集完成，包含 {len(dataset.samples)} 个样本")
+    # 🔧 创建llm-webkit抽取器（统一使用）
+    extractor_config = {"model_path": "/Users/chupei/model/checkpoint-3296"}
+    extractor = ExtractorFactory.create("llm-webkit", config=extractor_config)
+    print(f"🤖 使用抽取器: {extractor.name}")
     
-    # 创建抽取器并运行评测
-    try:
-        extractor = ExtractorFactory.create("llm-webkit", config={"model_path": "/Users/chupei/model/checkpoint-3296"})
-        print(f"🤖 使用抽取器: {extractor.name}")
-    except Exception as e:
-        print(f"⚠️ LLM-WebKit抽取器创建失败，使用mock抽取器: {e}")
-        extractor = ExtractorFactory.create("mock")
-    
-    # 运行评测
+    # 创建评测器
     evaluator = Evaluator()
-    result = evaluator.evaluate(dataset, extractor)
+    
+    # 🔧 选择评测模式：内存模式 vs 批处理模式
+    USE_BATCHED_MODE = True  # 设置为True使用批处理模式（适用于大数据集）
+    
+    if USE_BATCHED_MODE:
+        print("🔄 使用批处理模式（内存优化）")
+        
+        # 🚀 批处理评测（适用于大数据集）
+        result = evaluator.evaluate_batched(
+            jsonl_file_path=dataset_path,
+            extractor=extractor,  # 直接传递extractor对象
+            batch_size=10,        # 小批次
+            max_samples=20        # 演示用
+        )
+        print(f"✅ 批处理评测完成，总体得分: {result.overall_metrics.get('overall', 0):.4f}")
+        
+        # 为了保存带有抽取内容的数据集，需要重新加载原始数据集
+        # 注：这里只是短暂加载用于保存，不影响前面的内存优化评测
+        dataset = DataLoader.load_jsonl(dataset_path, include_results=False)
+        dataset.name = result.dataset_name
+            
+    else:
+        print("🔄 使用传统内存模式")
+        
+        # 从文件加载数据集
+        print(f"📂 从文件加载数据集: {dataset_path}")
+        dataset = DataLoader.load_jsonl(dataset_path, include_results=False)
+        dataset.name = "WebMainBench_with_extraction"
+        dataset.description = "演示抽取内容保存的测试数据集"
+        
+        print(f"📊 加载数据集完成，包含 {len(dataset.samples)} 个样本")
+        
+        # 运行评测
+        result = evaluator.evaluate(dataset, extractor)
     
     print(f"✅ 评测完成，总体得分: {result.overall_metrics.get('overall', 0):.4f}")
     
