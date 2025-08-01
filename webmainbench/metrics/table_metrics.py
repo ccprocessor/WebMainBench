@@ -38,44 +38,9 @@ class TableEditMetric(EditDistanceMetric):
     
     def _extract_table_content(self, text: str, content_list: List[Dict[str, Any]] = None) -> str:
         """从文本和content_list中提取表格内容"""
-        table_parts = []
-        
-        # 优先从content_list中递归提取
-        if content_list:
-            table_parts = self._extract_tables_from_content_list(content_list)
-            
-            # 如果content_list中有表格，直接返回
-            if table_parts:
-                return '\n'.join(table_parts)
-        
-        # 只有当content_list中没有表格时，才从markdown文本中提取
-        if text:
-            lines = text.split('\n')
-            table_lines = []
-            in_table = False
-            
-            for line in lines:
-                if '|' in line:
-                    table_lines.append(line)
-                    in_table = True
-                elif in_table and line.strip() == '':
-                    # 表格结束
-                    if table_lines:
-                        table_parts.append('\n'.join(table_lines))
-                        table_lines = []
-                    in_table = False
-                elif in_table:
-                    # 表格内的非表格行，表格结束
-                    if table_lines:
-                        table_parts.append('\n'.join(table_lines))
-                        table_lines = []
-                    in_table = False
-            
-            # 处理文档末尾的表格
-            if table_lines:
-                table_parts.append('\n'.join(table_lines))
-        
-        return '\n'.join(table_parts)
+        # 使用统一的内容分割方法
+        content_parts = self.split_content(text, content_list)
+        return content_parts.get('table', '')
     
     def _extract_tables_from_content_list(self, content_list: List[Dict[str, Any]]) -> List[str]:
         """递归从content_list中提取表格内容"""
@@ -138,6 +103,6 @@ class TableTEDSMetric(TEDSMetric):
     
     def _extract_table_content(self, text: str, content_list: List[Dict[str, Any]] = None) -> str:
         """从文本和content_list中提取表格内容"""
-        # 复用TableEditMetric的表格提取逻辑
-        table_edit_metric = TableEditMetric("temp")
-        return table_edit_metric._extract_table_content(text, content_list) 
+        # 使用统一的内容分割方法
+        content_parts = self.split_content(text, content_list)
+        return content_parts.get('table', '') 

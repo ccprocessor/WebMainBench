@@ -1,0 +1,422 @@
+{
+  "metadata": {
+    "dataset_name": "WebMainBench_with_extraction",
+    "extractor_name": "llm-webkit",
+    "timestamp": "2025-07-31T20:59:14.074710",
+    "total_samples": 4
+  },
+  "overall_metrics": {
+    "code_edit": 0.6215153716583073,
+    "formula_edit": 1.0,
+    "table_edit": 0.9073262711864407,
+    "table_TEDS": 1.0,
+    "text_edit": 0.769470989706515,
+    "overall": 0.8596625265102527
+  },
+  "sample_results": [
+    {
+      "sample_id": "sample-001-programming-tutorial",
+      "extraction_success": true,
+      "extraction_time": 2.3819150924682617,
+      "extracted_content": "# Python编程教程\n\n这是一个Python基础教程，展示如何定义函数。\n\n```\ndef greet(name):\n    \"\"\"问候函数\"\"\"\n    return f\"Hello, {name}!\"\n\n# 使用示例\nresult = greet(\"World\")\nprint(result)\n```\n\n这个函数可以用来问候任何人。",
+      "extracted_content_list": [],
+      "metrics": {
+        "code_edit": {
+          "score": 0.49302325581395345,
+          "success": true,
+          "details": {
+            "distance": 109,
+            "predicted_length": 215,
+            "groundtruth_length": 106,
+            "normalized": true,
+            "predicted_code_length": 215,
+            "groundtruth_code_length": 106,
+            "content_type": "code"
+          }
+        },
+        "formula_edit": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "distance": 0,
+            "predicted_length": 0,
+            "groundtruth_length": 0,
+            "normalized": true,
+            "predicted_formula_length": 0,
+            "groundtruth_formula_length": 0,
+            "content_type": "formula"
+          }
+        },
+        "table_edit": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "distance": 0,
+            "predicted_length": 0,
+            "groundtruth_length": 0,
+            "normalized": true,
+            "predicted_table_length": 0,
+            "groundtruth_table_length": 0,
+            "content_type": "table"
+          }
+        },
+        "table_TEDS": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "edit_distance": 0.0,
+            "predicted_nodes": 3,
+            "groundtruth_nodes": 3,
+            "max_nodes": 3,
+            "structure_only": false,
+            "algorithm": "TEDS",
+            "content_type": "table"
+          }
+        },
+        "text_edit": {
+          "score": 0.9259259259259259,
+          "success": true,
+          "details": {
+            "distance": 4,
+            "predicted_length": 54,
+            "groundtruth_length": 50,
+            "normalized": true,
+            "predicted_text_length": 54,
+            "groundtruth_text_length": 50,
+            "content_type": "text"
+          }
+        },
+        "overall": {
+          "score": 0.8837898363479759,
+          "success": true,
+          "details": {
+            "source": "average_of_all_metrics",
+            "description": "Overall score as average of all successful metrics",
+            "successful_metrics": 5,
+            "failed_metrics": 0,
+            "individual_scores": {
+              "code_edit": 0.49302325581395345,
+              "formula_edit": 1.0,
+              "table_edit": 1.0,
+              "table_TEDS": 1.0,
+              "text_edit": 0.9259259259259259
+            }
+          }
+        }
+      },
+      "sample_metadata": {
+        "url": "https://python-tutorial.example.com/functions",
+        "domain": null,
+        "language": "en",
+        "content_type": "programming",
+        "difficulty": null
+      }
+    },
+    {
+      "sample_id": "sample-002-math-formulas",
+      "extraction_success": true,
+      "extraction_time": 3.2454159259796143,
+      "extracted_content": "# 数学公式示例\n\n这里展示一些基本的数学公式。\n\n勾股定理：a² + b² = c²\n\n二次方程的解为：\n\nx = (-b ± √(b² - 4ac)) / 2a\n\n欧拉公式是数学中最美丽的公式之一：e^(iπ) + 1 = 0\n\n| 函数 | 导数 |\n|---|---|\n| x² | 2x |\n| sin(x) | cos(x) |",
+      "extracted_content_list": [],
+      "metrics": {
+        "code_edit": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "distance": 0,
+            "predicted_length": 0,
+            "groundtruth_length": 0,
+            "normalized": true,
+            "predicted_code_length": 0,
+            "groundtruth_code_length": 0,
+            "content_type": "code"
+          }
+        },
+        "formula_edit": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "distance": 0,
+            "predicted_length": 0,
+            "groundtruth_length": 0,
+            "normalized": true,
+            "predicted_formula_length": 0,
+            "groundtruth_formula_length": 0,
+            "content_type": "formula"
+          }
+        },
+        "table_edit": {
+          "score": 0.8983050847457628,
+          "success": true,
+          "details": {
+            "distance": 6,
+            "predicted_length": 53,
+            "groundtruth_length": 59,
+            "normalized": true,
+            "predicted_table_length": 53,
+            "groundtruth_table_length": 59,
+            "content_type": "table"
+          }
+        },
+        "table_TEDS": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "edit_distance": 0.0,
+            "predicted_nodes": 10,
+            "groundtruth_nodes": 10,
+            "max_nodes": 10,
+            "structure_only": false,
+            "algorithm": "TEDS",
+            "content_type": "table"
+          }
+        },
+        "text_edit": {
+          "score": 0.6956521739130435,
+          "success": true,
+          "details": {
+            "distance": 35,
+            "predicted_length": 115,
+            "groundtruth_length": 80,
+            "normalized": true,
+            "predicted_text_length": 115,
+            "groundtruth_text_length": 80,
+            "content_type": "text"
+          }
+        },
+        "overall": {
+          "score": 0.9187914517317612,
+          "success": true,
+          "details": {
+            "source": "average_of_all_metrics",
+            "description": "Overall score as average of all successful metrics",
+            "successful_metrics": 5,
+            "failed_metrics": 0,
+            "individual_scores": {
+              "code_edit": 1.0,
+              "formula_edit": 1.0,
+              "table_edit": 0.8983050847457628,
+              "table_TEDS": 1.0,
+              "text_edit": 0.6956521739130435
+            }
+          }
+        }
+      },
+      "sample_metadata": {
+        "url": "https://math-examples.edu/formulas",
+        "domain": null,
+        "language": "zh",
+        "content_type": "academic",
+        "difficulty": null
+      }
+    },
+    {
+      "sample_id": "sample-003-data-analysis",
+      "extraction_success": true,
+      "extraction_time": 4.208301782608032,
+      "extracted_content": "# 数据分析报告\n\n以下是2024年第一季度的销售数据分析。\n\n## 数据处理代码\n\n```\nimport pandas as pd\nimport numpy as np\n\n# 读取数据\ndf = pd.read_csv('sales_q1_2024.csv')\n\n# 计算统计信息\nmonthly_avg = df.groupby('month')['sales'].mean()\nprint(f\"平均销售额: {monthly_avg}\")\n```\n\n## 销售统计\n\n| 月份 | 销售额(万元) | 增长率 |\n|---|---|---|\n| 1月 | 120.5 | +15.2% |\n| 2月 | 135.8 | +12.7% |\n| 3月 | 148.3 | +9.2% |\n\n标准差公式：σ = √(Σ(xi - μ)² / n)\n\n总体来看，第一季度销售表现良好，呈现稳定增长趋势。",
+      "extracted_content_list": [],
+      "metrics": {
+        "code_edit": {
+          "score": 0.49575070821529743,
+          "success": true,
+          "details": {
+            "distance": 178,
+            "predicted_length": 353,
+            "groundtruth_length": 175,
+            "normalized": true,
+            "predicted_code_length": 353,
+            "groundtruth_code_length": 175,
+            "content_type": "code"
+          }
+        },
+        "formula_edit": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "distance": 0,
+            "predicted_length": 0,
+            "groundtruth_length": 0,
+            "normalized": true,
+            "predicted_formula_length": 0,
+            "groundtruth_formula_length": 0,
+            "content_type": "formula"
+          }
+        },
+        "table_edit": {
+          "score": 0.856,
+          "success": true,
+          "details": {
+            "distance": 18,
+            "predicted_length": 107,
+            "groundtruth_length": 125,
+            "normalized": true,
+            "predicted_table_length": 107,
+            "groundtruth_table_length": 125,
+            "content_type": "table"
+          }
+        },
+        "table_TEDS": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "edit_distance": 0.0,
+            "predicted_nodes": 17,
+            "groundtruth_nodes": 17,
+            "max_nodes": 17,
+            "structure_only": false,
+            "algorithm": "TEDS",
+            "content_type": "table"
+          }
+        },
+        "text_edit": {
+          "score": 0.8773584905660378,
+          "success": true,
+          "details": {
+            "distance": 13,
+            "predicted_length": 106,
+            "groundtruth_length": 93,
+            "normalized": true,
+            "predicted_text_length": 106,
+            "groundtruth_text_length": 93,
+            "content_type": "text"
+          }
+        },
+        "overall": {
+          "score": 0.8458218397562671,
+          "success": true,
+          "details": {
+            "source": "average_of_all_metrics",
+            "description": "Overall score as average of all successful metrics",
+            "successful_metrics": 5,
+            "failed_metrics": 0,
+            "individual_scores": {
+              "code_edit": 0.49575070821529743,
+              "formula_edit": 1.0,
+              "table_edit": 0.856,
+              "table_TEDS": 1.0,
+              "text_edit": 0.8773584905660378
+            }
+          }
+        }
+      },
+      "sample_metadata": {
+        "url": "https://data-report.company.com/q1-2024-analysis",
+        "domain": null,
+        "language": "zh",
+        "content_type": "business",
+        "difficulty": null
+      }
+    },
+    {
+      "sample_id": "sample-004-algorithm-explanation",
+      "extraction_success": true,
+      "extraction_time": 4.118028879165649,
+      "extracted_content": "# 算法复杂度分析\n\n这里介绍常见算法的时间复杂度。\n\n## 快速排序实现\n\n```\ndef quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n\n    return quicksort(left) + middle + quicksort(right)\n```\n\n## 复杂度对比\n\n| 算法 | 最好情况 | 平均情况 | 最坏情况 |\n|---|---|---|---|\n| 快速排序 | O(n log n) | O(n log n) | O(n²) |\n| 归并排序 | O(n log n) | O(n log n) | O(n log n) |\n| 冒泡排序 | O(n) | O(n²) | O(n²) |\n\nMaster定理：T(n) = aT(n/b) + f(n)\n\n其中 a ≥ 1, b &gt; 1 是常数，f(n) 是正函数。",
+      "extracted_content_list": [],
+      "metrics": {
+        "code_edit": {
+          "score": 0.49728752260397835,
+          "success": true,
+          "details": {
+            "distance": 278,
+            "predicted_length": 553,
+            "groundtruth_length": 283,
+            "normalized": true,
+            "predicted_code_length": 553,
+            "groundtruth_code_length": 283,
+            "content_type": "code"
+          }
+        },
+        "formula_edit": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "distance": 0,
+            "predicted_length": 0,
+            "groundtruth_length": 0,
+            "normalized": true,
+            "predicted_formula_length": 0,
+            "groundtruth_formula_length": 0,
+            "content_type": "formula"
+          }
+        },
+        "table_edit": {
+          "score": 0.875,
+          "success": true,
+          "details": {
+            "distance": 24,
+            "predicted_length": 168,
+            "groundtruth_length": 192,
+            "normalized": true,
+            "predicted_table_length": 168,
+            "groundtruth_table_length": 192,
+            "content_type": "table"
+          }
+        },
+        "table_TEDS": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "edit_distance": 0.0,
+            "predicted_nodes": 21,
+            "groundtruth_nodes": 21,
+            "max_nodes": 21,
+            "structure_only": false,
+            "algorithm": "TEDS",
+            "content_type": "table"
+          }
+        },
+        "text_edit": {
+          "score": 0.5789473684210527,
+          "success": true,
+          "details": {
+            "distance": 48,
+            "predicted_length": 114,
+            "groundtruth_length": 67,
+            "normalized": true,
+            "predicted_text_length": 114,
+            "groundtruth_text_length": 67,
+            "content_type": "text"
+          }
+        },
+        "overall": {
+          "score": 0.7902469782050062,
+          "success": true,
+          "details": {
+            "source": "average_of_all_metrics",
+            "description": "Overall score as average of all successful metrics",
+            "successful_metrics": 5,
+            "failed_metrics": 0,
+            "individual_scores": {
+              "code_edit": 0.49728752260397835,
+              "formula_edit": 1.0,
+              "table_edit": 0.875,
+              "table_TEDS": 1.0,
+              "text_edit": 0.5789473684210527
+            }
+          }
+        }
+      },
+      "sample_metadata": {
+        "url": "https://algorithm-guide.cs.edu/complexity-analysis",
+        "domain": null,
+        "language": "zh",
+        "content_type": "computer_science",
+        "difficulty": null
+      }
+    }
+  ],
+  "category_metrics": null,
+  "error_analysis": {
+    "total_samples": 4,
+    "failed_count": 0,
+    "success_rate": 1.0,
+    "common_errors": {},
+    "sample_errors": []
+  },
+  "extractor_config": {
+    "model_path": "/Users/chupei/model/checkpoint-3296"
+  },
+  "metric_config": {}
+}

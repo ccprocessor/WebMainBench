@@ -146,6 +146,7 @@ class DataSaver:
             
             row = {
                 'extractor': metadata.get('extractor_name', 'unknown'),
+                'dataset': metadata.get('dataset_name', 'unknown'),
                 'total_samples': metadata.get('total_samples', 0),
                 'success_rate': error_analysis.get('success_rate', 0.0)
             }
@@ -166,7 +167,7 @@ class DataSaver:
         # Write CSV file
         if csv_data:
             # Define field order: basic info first, then overall, then other metrics alphabetically
-            basic_fields = ['extractor', 'total_samples', 'success_rate']
+            basic_fields = ['extractor', 'dataset', 'total_samples', 'success_rate']
             
             # Get all metric fields from the data
             all_fields = set()
@@ -191,6 +192,79 @@ class DataSaver:
                 writer.writeheader()
                 writer.writerows(csv_data)
     
+
+    @staticmethod
+    def save_dataset_with_extraction(results: Union["EvaluationResult", Dict[str, Any]], 
+                                   dataset: "BenchmarkDataset",
+                                   file_path: Union[str, Path],
+                                   extractor_name: str = None) -> None:
+        """
+        Save original dataset with extracted content added for manual review.
+        
+        Args:
+            results: EvaluationResult instance or its dictionary representation
+            dataset: Original dataset
+            file_path: Output JSONL file path
+            extractor_name: Name of the extractor (used for field naming)
+        """
+        file_path = Path(file_path)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Convert EvaluationResult to dict if needed
+        if hasattr(results, 'to_dict'):
+            results_dict = results.to_dict()
+        else:
+            results_dict = results
+        
+        # Get extractor name
+        if not extractor_name:
+            extractor_name = results_dict.get('metadata', {}).get('extractor_name', 'extracted')
+        
+        # Create mapping from sample_id to extraction result
+        sample_results = results_dict.get('sample_results', [])
+        extraction_map = {}
+        for sample_result in sample_results:
+            sample_id = sample_result.get('sample_id')
+            if sample_id:
+                extraction_map[sample_id] = sample_result
+        
+        # Process each sample and add extracted content
+        enriched_samples = []
+        for sample in dataset.samples:
+            # Convert sample to dict
+            sample_dict = sample.to_dict()
+            
+            # Add extraction results if available
+            extraction_result = extraction_map.get(sample.id)
+            if extraction_result:
+                # Add extracted content with extractor name prefix
+                sample_dict[f'{extractor_name}_content'] = extraction_result.get('extracted_content', '')
+                sample_dict[f'{extractor_name}_content_list'] = extraction_result.get('extracted_content_list', [])
+                sample_dict[f'{extractor_name}_success'] = extraction_result.get('extraction_success', False)
+                sample_dict[f'{extractor_name}_time'] = extraction_result.get('extraction_time', 0)
+                
+                # Add metric scores for quick review
+                metrics = extraction_result.get('metrics', {})
+                for metric_name, metric_data in metrics.items():
+                    if isinstance(metric_data, dict) and metric_data.get('success', False):
+                        sample_dict[f'{extractor_name}_{metric_name}_score'] = metric_data.get('score', 0)
+            
+            enriched_samples.append(sample_dict)
+        
+        # Save as JSONL
+        DataSaver._save_jsonl_list(enriched_samples, file_path)
+    
+    @staticmethod
+    def _save_jsonl_list(data_list: List[Dict[str, Any]], file_path: Union[str, Path]) -> None:
+        """Save list of dictionaries as JSONL file."""
+        import json
+        
+        file_path = Path(file_path)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            for item in data_list:
+                json.dump(item, f, ensure_ascii=False)
+                f.write('\n')
+
     @staticmethod
     def export_for_analysis(dataset: BenchmarkDataset,
                            file_path: Union[str, Path],

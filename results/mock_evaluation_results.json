@@ -2,33 +2,40 @@
   "metadata": {
     "dataset_name": "sample_dataset",
     "extractor_name": "mock",
-    "timestamp": "2025-07-31T14:59:49.917729",
+    "timestamp": "2025-07-31T20:58:50.086310",
     "total_samples": 2
   },
   "overall_metrics": {
-    "code_edit": 1.0,
+    "code_edit": 0.5,
     "formula_edit": 1.0,
-    "table_edit": 1.0,
-    "table_TEDS": 1.0,
-    "text_edit": 0.0,
-    "overall": 0.8
+    "table_edit": 0.5,
+    "table_TEDS": 0.5,
+    "text_edit": 0.006249999999999978,
+    "overall": 0.50125
   },
   "sample_results": [
     {
       "sample_id": "sample-001-programming-tutorial",
       "extraction_success": true,
-      "extraction_time": 7.3909759521484375e-06,
+      "extraction_time": 4.0531158447265625e-06,
+      "extracted_content": "提取的内容",
+      "extracted_content_list": [
+        {
+          "type": "paragraph",
+          "content": "提取的内容"
+        }
+      ],
       "metrics": {
         "code_edit": {
-          "score": 1.0,
+          "score": 0.0,
           "success": true,
           "details": {
-            "distance": 0,
+            "distance": 106,
             "predicted_length": 0,
-            "groundtruth_length": 0,
+            "groundtruth_length": 106,
             "normalized": true,
             "predicted_code_length": 0,
-            "groundtruth_code_length": 0,
+            "groundtruth_code_length": 106,
             "content_type": "code"
           }
         },
@@ -75,17 +82,17 @@
           "score": 0.0,
           "success": true,
           "details": {
-            "distance": 5,
+            "distance": 50,
             "predicted_length": 5,
-            "groundtruth_length": 0,
+            "groundtruth_length": 50,
             "normalized": true,
             "predicted_text_length": 5,
-            "groundtruth_text_length": 0,
+            "groundtruth_text_length": 50,
             "content_type": "text"
           }
         },
         "overall": {
-          "score": 0.8,
+          "score": 0.6,
           "success": true,
           "details": {
             "source": "average_of_all_metrics",
@@ -93,7 +100,7 @@
             "successful_metrics": 5,
             "failed_metrics": 0,
             "individual_scores": {
-              "code_edit": 1.0,
+              "code_edit": 0.0,
               "formula_edit": 1.0,
               "table_edit": 1.0,
               "table_TEDS": 1.0,
@@ -113,7 +120,14 @@
     {
       "sample_id": "sample-002-math-formulas",
       "extraction_success": true,
-      "extraction_time": 1.9073486328125e-06,
+      "extraction_time": 2.1457672119140625e-06,
+      "extracted_content": "提取的内容",
+      "extracted_content_list": [
+        {
+          "type": "paragraph",
+          "content": "提取的内容"
+        }
+      ],
       "metrics": {
         "code_edit": {
           "score": 1.0,
@@ -142,46 +156,46 @@
           }
         },
         "table_edit": {
-          "score": 1.0,
+          "score": 0.0,
           "success": true,
           "details": {
-            "distance": 0,
+            "distance": 59,
             "predicted_length": 0,
-            "groundtruth_length": 0,
+            "groundtruth_length": 59,
             "normalized": true,
             "predicted_table_length": 0,
-            "groundtruth_table_length": 0,
+            "groundtruth_table_length": 59,
             "content_type": "table"
           }
         },
         "table_TEDS": {
-          "score": 1.0,
+          "score": 0.0,
           "success": true,
           "details": {
-            "edit_distance": 0.0,
+            "edit_distance": 10.0,
             "predicted_nodes": 3,
-            "groundtruth_nodes": 3,
-            "max_nodes": 3,
+            "groundtruth_nodes": 10,
+            "max_nodes": 10,
             "structure_only": false,
             "algorithm": "TEDS",
             "content_type": "table"
           }
         },
         "text_edit": {
-          "score": 0.0,
+          "score": 0.012499999999999956,
           "success": true,
           "details": {
-            "distance": 5,
+            "distance": 79,
             "predicted_length": 5,
-            "groundtruth_length": 0,
+            "groundtruth_length": 80,
             "normalized": true,
             "predicted_text_length": 5,
-            "groundtruth_text_length": 0,
+            "groundtruth_text_length": 80,
             "content_type": "text"
           }
         },
         "overall": {
-          "score": 0.8,
+          "score": 0.4025,
           "success": true,
           "details": {
             "source": "average_of_all_metrics",
@@ -191,9 +205,9 @@
             "individual_scores": {
               "code_edit": 1.0,
               "formula_edit": 1.0,
-              "table_edit": 1.0,
-              "table_TEDS": 1.0,
-              "text_edit": 0.0
+              "table_edit": 0.0,
+              "table_TEDS": 0.0,
+              "text_edit": 0.012499999999999956
             }
           }
         }
