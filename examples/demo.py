@@ -4,7 +4,7 @@ from webmainbench import DataLoader, Evaluator, ExtractorFactory
 dataset = DataLoader.load_jsonl("../data/sample_dataset.jsonl")
 
 # 2. 创建抽取器
-extractor = ExtractorFactory.create("resiliparse")
+extractor = ExtractorFactory.create("llm-webkit")
 
 # 3. 运行评测
 evaluator = Evaluator()
