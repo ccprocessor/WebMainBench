@@ -370,19 +370,15 @@ Output format should be a JSON-formatted string representing a dictionary where 
                 trust_remote_code=True
             )
             
-            # vLLM配置
+            # vLLM配置 - 参考ray_test_qa.py的简化配置
             model_kwargs = {
                 "model": self.inference_config.model_path,
                 "trust_remote_code": True,
                 "dtype": self.inference_config.dtype,
                 "tensor_parallel_size": self.inference_config.tensor_parallel_size,
-                "max_model_len": self.inference_config.max_tokens,
-                "max_num_batched_tokens": max(self.inference_config.max_tokens, 8192),
-                "gpu_memory_utilization": self.inference_config.gpu_memory_utilization,
-                "enforce_eager": self.inference_config.enforce_eager,
-                "disable_custom_all_reduce": True,
-                "load_format": "auto",
             }
+            
+            print(f"🔧 vLLM配置: {model_kwargs}")
             
             self.model = LLM(**model_kwargs)
             
@@ -397,8 +393,8 @@ Output format should be a JSON-formatted string representing a dictionary where 
             print("✅ vLLM模型加载成功!")
             
         except Exception as e:
-            print(f"⚠️  vLLM加载失败，回退到transformers: {e}")
-            self._load_transformers_model()
+            print(f"❌ vLLM加载失败: {e}")
+            raise RuntimeError(f"vLLM模型加载失败: {e}")
     
     def _create_prompt(self, simplified_html: str) -> str:
         """创建分类提示."""
