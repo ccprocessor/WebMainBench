@@ -459,7 +459,7 @@ Output format should be a JSON-formatted string representing a dictionary where 
             
         except Exception as e:
             print(f"⚠️  transformers生成失败: {e}")
-            return "{}"
+            raise RuntimeError(f"transformers生成失败: {e}")
     
     def _extract_json_from_text(self, text: str) -> str:
         """从生成的文本中提取JSON"""
