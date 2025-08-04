@@ -98,6 +98,9 @@ class DataSaver:
         else:
             results_dict = results
         
+        # 移除extracted_content和extracted_content_list字段以减少文件大小
+        results_dict = DataSaver._remove_content_fields(results_dict)
+        
         if format.lower() == "json":
             with open(file_path, 'w', encoding='utf-8') as f:
                 json.dump(results_dict, f, indent=2, ensure_ascii=False)
@@ -264,6 +267,30 @@ class DataSaver:
             for item in data_list:
                 json.dump(item, f, ensure_ascii=False)
                 f.write('\n')
+    
+    @staticmethod
+    def _remove_content_fields(data: Dict[str, Any]) -> Dict[str, Any]:
+        """移除extracted_content和extracted_content_list字段以减少保存文件大小"""
+        import copy
+        
+        cleaned_data = copy.deepcopy(data)
+        
+        def remove_fields(obj):
+            if isinstance(obj, dict):
+                # 移除extracted_content和extracted_content_list字段
+                obj.pop('extracted_content', None)
+                obj.pop('extracted_content_list', None)
+                # 递归处理嵌套字典和列表
+                for value in obj.values():
+                    if isinstance(value, (dict, list)):
+                        remove_fields(value)
+            elif isinstance(obj, list):
+                for item in obj:
+                    if isinstance(item, (dict, list)):
+                        remove_fields(item)
+        
+        remove_fields(cleaned_data)
+        return cleaned_data
     
     @staticmethod
     def append_intermediate_results(results: List[Dict[str, Any]], 
