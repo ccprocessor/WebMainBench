@@ -307,8 +307,11 @@ class Evaluator:
 
     def _evaluate_sample(self, sample: DataSample, extractor: BaseExtractor) -> Dict[str, Any]:
         """Evaluate a single sample."""
-        # Extract content
-        extraction_result = extractor.extract(sample.html, sample.url)
+        if extractor.__class__.__name__ == 'TestModelExtractor':
+            extraction_result = extractor.extract_from_sample(sample)
+        else:
+            # Extract content
+            extraction_result = extractor.extract(sample.html, sample.url)
         
         # Prepare result
         sample_result = {
