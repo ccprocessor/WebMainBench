@@ -18,7 +18,8 @@ class DataSample:
     html: str  # HTML with cc-select=true annotations
     groundtruth_content: str  # Groundtruth markdown content
     groundtruth_content_list: List[Dict[str, Any]]  # Groundtruth content_list from llm-webkit
-    
+    content_list: List[Dict[str, Any]] = None # Content_list from llm-webkit
+    content: str = None  # Content from llm-webkit
     # Optional metadata
     url: Optional[str] = None
     domain: Optional[str] = None
@@ -26,6 +27,7 @@ class DataSample:
     content_type: Optional[str] = None  # article, forum, blog, etc.
     difficulty: Optional[str] = None  # easy, medium, hard
     tags: Optional[List[str]] = None
+    llm_webkit_md: Optional[str] = None
     
     # Extracted results (populated during evaluation)
     extracted_results: Optional[Dict[str, Any]] = None
@@ -37,6 +39,9 @@ class DataSample:
             "html": self.html,
             "groundtruth_content": self.groundtruth_content,
             "groundtruth_content_list": self.groundtruth_content_list,
+            "content_list": self.content_list,
+            "content": self.content,
+            "llm_webkit_md": self.llm_webkit_md,
             "url": self.url,
             "domain": self.domain,
             "language": self.language,
