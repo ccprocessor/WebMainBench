@@ -1,2 +1,2 @@
 extractor,dataset,total_samples,success_rate,overall,code_edit,formula_edit,table_TEDS,table_edit,text_edit
-llm-webkit,sample_dataset,4,0.75,0.8667,1.0,1.0,1.0,1.0,0.3333
+llm-webkit,sample_dataset,4,0.5,0.9,1.0,1.0,1.0,1.0,0.5
