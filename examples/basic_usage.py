@@ -801,8 +801,8 @@ def demo_multi_extraction():
 
     # 配置文件路径
     data_dir = Path("../data")
-    # dataset_path = data_dir / "sample_dataset.jsonl"
-    dataset_path = "/home/lulindong/Pycharm_projects/cc/test.jsonl"
+    dataset_path = data_dir / "sample_dataset.jsonl"
+    # dataset_path = "/home/lulindong/Pycharm_projects/cc/test.jsonl"
 
     print(f"📂 数据集文件: {dataset_path}")
 
@@ -816,8 +816,8 @@ def demo_multi_extraction():
             "preserve_formatting": True
         }},
 
-        # {"name": "trafilatura", "config": {}},
-        # {"name": "magic-html", "config": {}},
+        {"name": "trafilatura", "config": {}},
+        {"name": "magic-html", "config": {}},
     ]
 
     # 🔧 选择评测模式：内存模式 vs 批处理模式
