@@ -61,6 +61,7 @@ class DataSample:
         # 定义字段名映射（外部字段名 -> 内部字段名）
         field_mapping = {
             "track_id": "id",  # track_id 映射到 id
+            "groundtruth_llm_webkit_md": "groundtruth_content",  # groundtruth_llm_webkit_md 映射到 groundtruth_content
             "content": "groundtruth_content",  # content 映射到 groundtruth_content
             "content_list": "groundtruth_content_list",  # content_list 映射到 groundtruth_content_list
         }
