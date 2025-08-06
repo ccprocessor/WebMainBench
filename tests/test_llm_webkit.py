@@ -4,6 +4,17 @@ from webmainbench.extractors.factory import ExtractorFactory
 from webmainbench.extractors.base import ExtractionResult
 
 
+def _is_llm_webkit_available():
+    """检查LLM-WebKit是否可用（用于预处理HTML模式）."""
+    try:
+        from webmainbench.extractors.factory import ExtractorFactory
+        config = {"use_preprocessed_html": True}
+        extractor = ExtractorFactory.create("llm-webkit", config)
+        return True
+    except Exception:
+        return False
+
+
 class TestLLMWebKitExtractor(unittest.TestCase):
     """LLM-WebKit extractor功能测试."""
 
@@ -147,6 +158,10 @@ class TestLLMWebKitExtractor(unittest.TestCase):
         except Exception as e:
             self.skipTest(f"LLM-WebKit dependencies not available: {e}")
 
+    @unittest.skipUnless(
+        _is_llm_webkit_available(),
+        "跳过：需要LLM-WebKit依赖"
+    )
     def test_preprocessed_html_integration(self):
         """集成测试：演示预处理HTML功能的实际使用."""
         print("\n" + "="*50)
@@ -217,6 +232,10 @@ class TestLLMWebKitExtractor(unittest.TestCase):
         except Exception as e:
             self.skipTest(f"LLM-WebKit dependencies not available: {e}")
 
+    @unittest.skipIf(
+        not _is_llm_webkit_available(),
+        "LLM-WebKit dependencies not available"
+    )
     def test_preprocessed_html_e2e(self):
         """预处理HTML功能的端到端测试."""
         try:
