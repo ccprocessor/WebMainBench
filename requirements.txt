@@ -1,1 +1,9 @@
 rapidFuzz
+setuptools
+jsonlines
+beautifulsoup4
+requests
+torch
+html2text
+resiliparse
+trafilatura
