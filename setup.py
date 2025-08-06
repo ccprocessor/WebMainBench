@@ -32,7 +32,7 @@ setup(
     ],
     python_requires=">=3.8",
     install_requires=[
-        "lxml>=4.9.0",
+        "lxml==5.3.0",
         "jsonlines>=3.1.0",
         "requests>=2.28.0",
         "beautifulsoup4==4.12.0",
@@ -45,9 +45,9 @@ setup(
             "unstructured>=0.10.0",
         ],
         "llm": [
-            "torch>=2.0.0",
-            "transformers>=4.30.0",
-            "vllm>=0.4.0",
+            "torch==2.6.0",
+            "transformers==4.52.4",
+            "vllm==0.8.5.post1",
             "llm_web_kit>=3.0.0",
         ],
         "nlp": [
