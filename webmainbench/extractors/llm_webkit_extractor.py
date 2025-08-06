@@ -28,6 +28,8 @@ class LLMInferenceConfig:
     max_item_count: int = 1000      # 最大item数量
     gpu_memory_utilization: float = 0.8  # GPU内存利用率
     enforce_eager: bool = True      # 使用eager模式
+    use_preprocessed_html: bool = False  # 是否使用预处理的HTML（跳过HTML简化步骤）
+    preprocessed_html_field: str = "llm_webkit_html"  # 预处理HTML字段名
 
 
 class TokenState(Enum):
@@ -208,7 +210,7 @@ Input HTML:
 Output format should be a JSON-formatted string representing a dictionary where keys are item_id strings and values are either 'main' or 'other'. Make sure to include ALL item_ids from the input HTML."""
 
     def __init__(self, name: str, config: Optional[Dict[str, Any]] = None):
-        super().__init__(name, config)
+        # 先初始化inference_config，再调用父类初始化（因为父类会调用_setup()）
         self.inference_config = LLMInferenceConfig()
         self.model = None
         self.tokenizer = None
@@ -219,6 +221,9 @@ Output format should be a JSON-formatted string representing a dictionary where 
             for key, value in config.items():
                 if hasattr(self.inference_config, key):
                     setattr(self.inference_config, key, value)
+        
+        # 现在可以安全地调用父类初始化（会调用_setup()）
+        super().__init__(name, config)
     
     def _setup(self) -> None:
         """Setup the LLM-WebKit extractor with advanced inference capabilities."""
@@ -233,46 +238,66 @@ Output format should be a JSON-formatted string representing a dictionary where 
         # 检查各个依赖模块的可用性
         missing_modules = []
         
-        # 检查 llm_web_kit
-        try:
-            from llm_web_kit.main_html_parser.simplify_html.simplify_html import simplify_html
-            from llm_web_kit.input.pre_data_json import PreDataJson, PreDataJsonKey
-            from llm_web_kit.main_html_parser.parser.tag_mapping import MapItemToHtmlTagsParser
+        # 如果使用预处理HTML模式，只需要检查llm_web_kit的基础功能
+        if self.inference_config.use_preprocessed_html:
+            # 预处理HTML模式：只检查内容提取相关的依赖
+            try:
+                from llm_web_kit.main_html_parser.parser.tag_mapping import MapItemToHtmlTagsParser
+                self._MapItemToHtmlTagsParser = MapItemToHtmlTagsParser
+            except ImportError as e:
+                missing_modules.append(f"llm_web_kit (content extraction): {e}")
             
-            self._simplify_html = simplify_html
-            self._PreDataJson = PreDataJson
-            self._PreDataJsonKey = PreDataJsonKey
-            self._MapItemToHtmlTagsParser = MapItemToHtmlTagsParser
+            # 设置可用性标志（预处理模式下不需要LLM）
+            self._transformers_available = False
+            self._vllm_available = False
+        else:
+            # 标准模式：检查完整的依赖
+            # 检查 llm_web_kit
+            try:
+                from llm_web_kit.main_html_parser.simplify_html.simplify_html import simplify_html
+                from llm_web_kit.input.pre_data_json import PreDataJson, PreDataJsonKey
+                from llm_web_kit.main_html_parser.parser.tag_mapping import MapItemToHtmlTagsParser
+                
+                self._simplify_html = simplify_html
+                self._PreDataJson = PreDataJson
+                self._PreDataJsonKey = PreDataJsonKey
+                self._MapItemToHtmlTagsParser = MapItemToHtmlTagsParser
+                
+            except ImportError as e:
+                missing_modules.append(f"llm_web_kit: {e}")
             
-        except ImportError as e:
-            missing_modules.append(f"llm_web_kit: {e}")
-        
-        # 检查 transformers（延迟到实际使用时）
-        self._transformers_available = False
-        try:
-            import transformers
-            self._transformers_available = True
-        except ImportError as e:
-            missing_modules.append(f"transformers: {e}")
-        
-        # 检查 vllm（延迟到实际使用时）
-        self._vllm_available = False
-        try:
-            import vllm
-            from vllm import SamplingParams
-            self._SamplingParams = SamplingParams
-            self._vllm_available = True
-        except ImportError as e:
-            missing_modules.append(f"vllm: {e}")
+            # 检查 transformers（延迟到实际使用时）
+            self._transformers_available = False
+            try:
+                import transformers
+                self._transformers_available = True
+            except ImportError as e:
+                missing_modules.append(f"transformers: {e}")
+            
+            # 检查 vllm（延迟到实际使用时）
+            self._vllm_available = False
+            try:
+                import vllm
+                from vllm import SamplingParams
+                self._SamplingParams = SamplingParams
+                self._vllm_available = True
+            except ImportError as e:
+                missing_modules.append(f"vllm: {e}")
         
         # 如果关键模块缺失，提供详细的错误信息
         if missing_modules:
-            error_msg = "LLM-WebKit extractor requires additional dependencies:\n"
-            error_msg += "\n".join([f"  • {module}" for module in missing_modules])
-            error_msg += "\n\nTo install dependencies:\n"
-            error_msg += "  pip install llm_web_kit transformers vllm torch\n"
-            error_msg += "\nFor CPU-only usage (limited functionality):\n"
-            error_msg += "  pip install llm_web_kit transformers torch --index-url https://download.pytorch.org/whl/cpu"
+            if self.inference_config.use_preprocessed_html:
+                error_msg = "LLM-WebKit extractor (preprocessed HTML mode) requires:\n"
+                error_msg += "\n".join([f"  • {module}" for module in missing_modules])
+                error_msg += "\n\nTo install dependencies:\n"
+                error_msg += "  pip install llm_web_kit"
+            else:
+                error_msg = "LLM-WebKit extractor requires additional dependencies:\n"
+                error_msg += "\n".join([f"  • {module}" for module in missing_modules])
+                error_msg += "\n\nTo install dependencies:\n"
+                error_msg += "  pip install llm_web_kit transformers vllm torch\n"
+                error_msg += "\nFor CPU-only usage (limited functionality):\n"
+                error_msg += "  pip install llm_web_kit transformers torch --index-url https://download.pytorch.org/whl/cpu"
             
             raise RuntimeError(error_msg)
     
@@ -581,13 +606,13 @@ Output format should be a JSON-formatted string representing a dictionary where 
             print(f"❌ 错误详情: {traceback.format_exc()}")
             return "", []
     
-    
+
     def _extract_content(self, html: str, url: str = None) -> ExtractionResult:
         """
         使用高级LLM推理提取内容.
         
         Args:
-            html: HTML内容
+            html: HTML内容或主HTML内容（如果配置了use_preprocessed_html）
             url: 可选的页面URL
             
         Returns:
@@ -596,6 +621,28 @@ Output format should be a JSON-formatted string representing a dictionary where 
         start_time = time.time()
         
         try:
+            # 检查是否使用预处理的HTML（跳过HTML简化步骤）
+            if self.inference_config.use_preprocessed_html:
+                # 直接使用传入的html作为main_html，调用_extract_content_from_main_html
+                print(f"📥 使用预处理HTML，跳过HTML简化步骤")
+                content, content_list = self._extract_content_from_main_html(html, url)
+                
+                extraction_time = time.time() - start_time
+                
+                # 创建结果对象
+                result = ExtractionResult(
+                    content=content,
+                    # content_list=content_list,
+                    title=self._extract_title(html),  # 从主内容提取标题
+                    language=self._detect_language(content),
+                    confidence_score=0.9,  # 预处理HTML的置信度设为0.9
+                    extraction_time=extraction_time,
+                    success=True
+                )
+                
+                return result
+            
+            # 标准流程：HTML简化 + LLM推理
             # 步骤1: HTML简化处理
             simplified_html, typical_raw_tag_html, _ = self._simplify_html(html)
             
