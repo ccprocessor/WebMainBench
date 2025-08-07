@@ -70,36 +70,76 @@ class MetricCalculator:
         Returns:
             Dictionary mapping metric names to MetricResult instances
         """
-        results = {}
-        
-        for metric_name, metric in self.metrics.items():
-            try:
-                if metric_name in ["edit_distance", "bleu", "rouge"]:
-                    # Text-based metrics
-                    result = metric.calculate(predicted_content, groundtruth_content, **kwargs)
-                elif metric_name in ["code_edit", "formula_edit", 
-                                   "table_edit", "table_TEDS", "text_edit"]:
-                    # 新的内容类型指标，需要传递 content_list
-                    result = metric.calculate(
-                        predicted_content, 
-                        groundtruth_content,
-                        predicted_content_list=predicted_content_list,
-                        groundtruth_content_list=groundtruth_content_list,
-                        **kwargs
-                    )
-                else:
-                    # Generic calculation
-                    result = metric.calculate(predicted_content, groundtruth_content, **kwargs)
-                
-                results[metric_name] = result
-                
-            except Exception as e:
-                # Create error result for failed metrics
-                results[metric_name] = MetricResult.create_error_result(
-                    metric_name, f"Metric calculation failed: {str(e)}"
+        # results = {}
+        #
+        # for metric_name, metric in self.metrics.items():
+        #     try:
+        #         if metric_name in ["edit_distance", "bleu", "rouge"]:
+        #             # Text-based metrics
+        #             result = metric.calculate(predicted_content, groundtruth_content, **kwargs)
+        #         elif metric_name in ["code_edit", "formula_edit",
+        #                            "table_edit", "table_TEDS", "text_edit"]:
+        #             # 新的内容类型指标，需要传递 content_list
+        #             result = metric.calculate(
+        #                 predicted_content,
+        #                 groundtruth_content,
+        #                 predicted_content_list=predicted_content_list,
+        #                 groundtruth_content_list=groundtruth_content_list,
+        #                 **kwargs
+        #             )
+        #         else:
+        #             # Generic calculation
+        #             result = metric.calculate(predicted_content, groundtruth_content, **kwargs)
+        #
+        #         results[metric_name] = result
+        #
+        #     except Exception as e:
+        #         # Create error result for failed metrics
+        #         results[metric_name] = MetricResult.create_error_result(
+        #             metric_name, f"Metric calculation failed: {str(e)}"
+        #         )
+
+        results: Dict[str, MetricResult] = {}
+
+        # 1. 先计算非表格指标（无依赖关系）
+        for metric_name in list(self.metrics.keys()):
+            if metric_name in ["table_edit", "table_TEDS"]:
+                continue  # 表格相关指标单独处理
+
+            metric = self.metrics[metric_name]
+            result = metric.calculate(
+                predicted=predicted_content,
+                groundtruth=groundtruth_content,
+                predicted_content_list=predicted_content_list,
+                groundtruth_content_list=groundtruth_content_list, **kwargs
+            )
+            results[metric_name] = result
+
+        # 2. 处理表格相关指标（有依赖关系）
+        # 2.1 计算 table_edit
+        if "table_edit" in self.metrics:
+            table_edit_result = self.metrics["table_edit"].calculate(
+                predicted=predicted_content,
+                groundtruth=groundtruth_content,
+                predicted_content_list=predicted_content_list,
+                groundtruth_content_list=groundtruth_content_list,
+                **kwargs
+            )
+            results["table_edit"] = table_edit_result
+
+            # 2.2 计算 table_TEDS（依赖 table_edit 的结果）
+            if "table_TEDS" in self.metrics:
+                teds_result = self.metrics["table_TEDS"].calculate(
+                    predicted=predicted_content,
+                    groundtruth=groundtruth_content,
+                    predicted_content_list=predicted_content_list,
+                    groundtruth_content_list=groundtruth_content_list,
+                    table_edit_result=table_edit_result,  # 传递依赖结果
+                    **kwargs
                 )
+                results["table_TEDS"] = teds_result
         
-        # Add overall score as average of all metrics
+        # 3. 计算综合得分（所有成功指标的平均值）
         successful_scores = []
         failed_metrics = []
         

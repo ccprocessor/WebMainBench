@@ -361,32 +361,72 @@ class Evaluator:
     
     def _aggregate_metrics(self, sample_results: List[Dict[str, Any]]) -> Dict[str, float]:
         """Aggregate metrics across all samples."""
-        # Collect metric results by metric name
-        metric_groups = {}
-        
-        for sample_result in sample_results:
-            if not sample_result.get('extraction_success', True):
-                continue
-                
-            metrics = sample_result.get('metrics', {})
-            for metric_name, metric_data in metrics.items():
-                if metric_data.get('success', False):
-                    if metric_name not in metric_groups:
-                        metric_groups[metric_name] = []
-                    metric_groups[metric_name].append(metric_data['score'])
-        
-        # Calculate aggregated scores
-        aggregated_metrics = {}
-        for metric_name, scores in metric_groups.items():
-            if scores:
-                aggregated_metrics[metric_name] = sum(scores) / len(scores)
+        # # Collect metric results by metric name
+        # metric_groups = {}
+        #
+        # for sample_result in sample_results:
+        #     if not sample_result.get('extraction_success', True):
+        #         continue
+        #
+        #     metrics = sample_result.get('metrics', {})
+        #     for metric_name, metric_data in metrics.items():
+        #         if metric_data.get('success', False):
+        #             if metric_name not in metric_groups:
+        #                 metric_groups[metric_name] = []
+        #             metric_groups[metric_name].append(metric_data['score'])
+        #
+        # # Calculate aggregated scores
+        # aggregated_metrics = {}
+        # for metric_name, scores in metric_groups.items():
+        #     if scores:
+        #         aggregated_metrics[metric_name] = sum(scores) / len(scores)
+        #     else:
+        #         aggregated_metrics[metric_name] = 0.0
+        #
+        # # overall score is already calculated by MetricCalculator
+        # # No need to override it here
+        #
+        # return aggregated_metrics
+        """
+            聚合所有样本的指标，计算全局平均值（每个指标单独聚合）
+            """
+        if not sample_results:
+            return {}
+
+        # 初始化每个指标的总分和样本数
+        metric_totals = {
+            "text_edit": 0.0,
+            "code_edit": 0.0,
+            "table_edit": 0.0,
+            "table_TEDS": 0.0,
+            "formula_edit": 0.0,
+            "overall": 0.0  # 全局overall单独计算
+        }
+        metric_counts = {k: 0 for k in metric_totals.keys()}  # 记录每个指标有效样本数
+
+        # 累加所有样本的指标分数
+        for sample in sample_results:
+            metrics = sample.get("metrics", {})
+            for metric_name in metric_totals.keys():
+                if metric_name in metrics and metrics[metric_name].get("success", False):
+                    metric_totals[metric_name] += metrics[metric_name]["score"]
+                    metric_counts[metric_name] += 1
+
+        # 计算每个指标的平均值（全局overall为5个单项指标的平均值）
+        overall_metrics = {}
+        for metric_name in metric_totals.keys():
+            if metric_counts[metric_name] > 0:
+                overall_metrics[metric_name] = metric_totals[metric_name] / metric_counts[metric_name]
             else:
-                aggregated_metrics[metric_name] = 0.0
-        
-        # overall score is already calculated by MetricCalculator
-        # No need to override it here
-        
-        return aggregated_metrics
+                overall_metrics[metric_name] = 0.0  # 无有效样本时默认为0
+
+        # 特别处理全局overall：固定为5个单项指标的平均值（无论单项是否有有效样本）
+        # 排除样本级overall，仅用5个核心指标计算全局overall
+        core_metrics = ["text_edit", "code_edit", "table_edit", "table_TEDS", "formula_edit"]
+        core_scores = [overall_metrics[metric] for metric in core_metrics]
+        overall_metrics["overall"] = sum(core_scores) / len(core_metrics)
+
+        return overall_metrics
     
     def _calculate_category_metrics(self, sample_results: List[Dict[str, Any]], 
                                   samples: List[DataSample]) -> Optional[Dict[str, Dict[str, float]]]:

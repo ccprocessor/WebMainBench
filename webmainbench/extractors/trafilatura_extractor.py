@@ -20,6 +20,8 @@ class TrafilaturaInferenceConfig:
     # 可根据需要添加更多trafilatura支持的参数
     include_images: bool = False
     include_links: bool = False
+    # 新增：支持的输出格式（txt/markdown/json/xml等）
+    output_format: str = "markdown"  # 默认保持纯文本
 
 
 @extractor("trafilatura")
@@ -65,7 +67,8 @@ class TrafilaturaExtractor(BaseExtractor):
                 include_comments=self.inference_config.include_comments,
                 include_tables=self.inference_config.include_tables,
                 include_images=self.inference_config.include_images,
-                include_links=self.inference_config.include_links
+                include_links=self.inference_config.include_links,
+                output_format=self.inference_config.output_format  # 传入输出格式
             )
 
             # 创建 content_list（简单分割段落）

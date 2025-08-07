@@ -796,13 +796,15 @@ def demo_multi_extraction():
     from webmainbench import DataLoader, DataSaver, Evaluator, ExtractorFactory
     from pathlib import Path
     import time
+
+
     # 设置日志
     setup_logging(level="INFO")
 
     # 配置文件路径
     data_dir = Path("../data")
-    dataset_path = data_dir / "sample_dataset.jsonl"
-    # dataset_path = "/home/lulindong/Pycharm_projects/cc/test.jsonl"
+    # dataset_path = data_dir / "sample_dataset.jsonl"
+    dataset_path = "/home/lulindong/Pycharm_projects/cc/WebMainBench_llm-webkit_v1_WebMainBench_dataset_merge_with_llm_webkit.jsonl"
 
     print(f"📂 数据集文件: {dataset_path}")
 
@@ -815,7 +817,6 @@ def demo_multi_extraction():
             "list_bullets": True,
             "preserve_formatting": True
         }},
-
         {"name": "trafilatura", "config": {}},
         {"name": "magic-html", "config": {}},
     ]
@@ -902,7 +903,7 @@ def demo_multi_extraction():
         all_results.append(result)
 
         # 保存带有当前抽取器内容的数据集
-        enriched_dataset_path = results_dir / f"{dataset.name}_with_{extractor.name}_extraction.jsonl"
+        enriched_dataset_path = results_dir / f"{dataset.name}_{extractor.name}_extraction_infer.jsonl"
         DataSaver.save_dataset_with_extraction(
             results=result,
             dataset=dataset,
