@@ -1,0 +1,223 @@
+{
+  "metadata": {
+    "dataset_name": "preprocessed_html_test",
+    "extractor_name": "llm-webkit",
+    "timestamp": "2025-08-06T16:58:51.991543",
+    "total_samples": 2
+  },
+  "overall_metrics": {
+    "code_edit": 0.5,
+    "formula_edit": 1.0,
+    "table_edit": 0.5,
+    "table_TEDS": 0.5,
+    "text_edit": 0.01428571428571429,
+    "overall": 0.5028571428571429
+  },
+  "sample_results": [
+    {
+      "sample_id": "preprocessed_sample_1",
+      "extraction_success": true,
+      "extraction_time": 0.9301280975341797,
+      "metrics": {
+        "code_edit": {
+          "score": 0.0,
+          "success": true,
+          "details": {
+            "distance": 208,
+            "predicted_length": 0,
+            "groundtruth_length": 208,
+            "normalized": true,
+            "predicted_code_length": 0,
+            "groundtruth_code_length": 208,
+            "content_type": "code"
+          }
+        },
+        "formula_edit": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "distance": 0,
+            "predicted_length": 0,
+            "groundtruth_length": 0,
+            "normalized": true,
+            "predicted_formula_length": 0,
+            "groundtruth_formula_length": 0,
+            "content_type": "formula"
+          }
+        },
+        "table_edit": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "distance": 0,
+            "predicted_length": 0,
+            "groundtruth_length": 0,
+            "normalized": true,
+            "predicted_table_length": 0,
+            "groundtruth_table_length": 0,
+            "content_type": "table"
+          }
+        },
+        "table_TEDS": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "edit_distance": 0.0,
+            "predicted_nodes": 3,
+            "groundtruth_nodes": 3,
+            "max_nodes": 3,
+            "structure_only": false,
+            "algorithm": "TEDS",
+            "content_type": "table"
+          }
+        },
+        "text_edit": {
+          "score": 0.02857142857142858,
+          "success": true,
+          "details": {
+            "distance": 68,
+            "predicted_length": 29,
+            "groundtruth_length": 70,
+            "normalized": true,
+            "predicted_text_length": 29,
+            "groundtruth_text_length": 70,
+            "content_type": "text"
+          }
+        },
+        "overall": {
+          "score": 0.6057142857142856,
+          "success": true,
+          "details": {
+            "source": "average_of_all_metrics",
+            "description": "Overall score as average of all successful metrics",
+            "successful_metrics": 5,
+            "failed_metrics": 0,
+            "individual_scores": {
+              "code_edit": 0.0,
+              "formula_edit": 1.0,
+              "table_edit": 1.0,
+              "table_TEDS": 1.0,
+              "text_edit": 0.02857142857142858
+            }
+          }
+        }
+      },
+      "sample_metadata": {
+        "url": null,
+        "domain": null,
+        "language": null,
+        "content_type": null,
+        "difficulty": null
+      }
+    },
+    {
+      "sample_id": "preprocessed_sample_2",
+      "extraction_success": true,
+      "extraction_time": 0.0038819313049316406,
+      "metrics": {
+        "code_edit": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "distance": 0,
+            "predicted_length": 0,
+            "groundtruth_length": 0,
+            "normalized": true,
+            "predicted_code_length": 0,
+            "groundtruth_code_length": 0,
+            "content_type": "code"
+          }
+        },
+        "formula_edit": {
+          "score": 1.0,
+          "success": true,
+          "details": {
+            "distance": 0,
+            "predicted_length": 0,
+            "groundtruth_length": 0,
+            "normalized": true,
+            "predicted_formula_length": 0,
+            "groundtruth_formula_length": 0,
+            "content_type": "formula"
+          }
+        },
+        "table_edit": {
+          "score": 0.0,
+          "success": true,
+          "details": {
+            "distance": 102,
+            "predicted_length": 0,
+            "groundtruth_length": 102,
+            "normalized": true,
+            "predicted_table_length": 0,
+            "groundtruth_table_length": 102,
+            "content_type": "table"
+          }
+        },
+        "table_TEDS": {
+          "score": 0.0,
+          "success": true,
+          "details": {
+            "edit_distance": 13.0,
+            "predicted_nodes": 3,
+            "groundtruth_nodes": 13,
+            "max_nodes": 13,
+            "structure_only": false,
+            "algorithm": "TEDS",
+            "content_type": "table"
+          }
+        },
+        "text_edit": {
+          "score": 0.0,
+          "success": true,
+          "details": {
+            "distance": 35,
+            "predicted_length": 13,
+            "groundtruth_length": 35,
+            "normalized": true,
+            "predicted_text_length": 13,
+            "groundtruth_text_length": 35,
+            "content_type": "text"
+          }
+        },
+        "overall": {
+          "score": 0.4,
+          "success": true,
+          "details": {
+            "source": "average_of_all_metrics",
+            "description": "Overall score as average of all successful metrics",
+            "successful_metrics": 5,
+            "failed_metrics": 0,
+            "individual_scores": {
+              "code_edit": 1.0,
+              "formula_edit": 1.0,
+              "table_edit": 0.0,
+              "table_TEDS": 0.0,
+              "text_edit": 0.0
+            }
+          }
+        }
+      },
+      "sample_metadata": {
+        "url": null,
+        "domain": null,
+        "language": null,
+        "content_type": null,
+        "difficulty": null
+      }
+    }
+  ],
+  "category_metrics": null,
+  "error_analysis": {
+    "total_samples": 2,
+    "failed_count": 0,
+    "success_rate": 1.0,
+    "common_errors": {},
+    "sample_errors": []
+  },
+  "extractor_config": {
+    "use_preprocessed_html": true,
+    "preprocessed_html_field": "llm_webkit_html"
+  },
+  "metric_config": {}
+}

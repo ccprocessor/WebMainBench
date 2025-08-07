@@ -944,13 +944,272 @@ def demo_multi_extraction():
         print(f"    - {name}_time: 单样本抽取耗时（秒）")
         print(f"    - {name}_*_score: 各指标得分（如{name}_text_edit）")
 
+
+def demo_llm_webkit_with_preprocessed_html_evaluation():
+    """演示LLM-WebKit预处理HTML功能的评测"""
+    
+    print("\n=== LLM-WebKit 预处理HTML功能演示 ===\n")
+    
+    # 设置日志
+    setup_logging(level="INFO")
+    
+    # 1. 创建包含预处理HTML的测试数据集
+    print("1. 创建包含预处理HTML的测试数据集...")
+    
+    samples = []
+    
+    # 样本1: 包含预处理的HTML（模拟第一阶段LLM简化后的结果）
+    sample_1_data = {
+        "id": "preprocessed_sample_1",
+        "html": """<html><body><h1>原始复杂HTML</h1><p>这里是原始的复杂HTML内容...</p></body></html>""",
+        # 这是关键：包含llm_webkit_html字段（预处理后的简化HTML）
+        "llm_webkit_html": """
+        <div _item_id="1">
+            <h1>深度学习基础教程</h1>
+            <p>深度学习是机器学习的一个重要分支，通过多层神经网络来学习数据的表征。</p>
+        </div>
+        <div _item_id="2">
+            <h2>核心概念</h2>
+            <p>神经网络由多个层组成，每层包含多个神经元。</p>
+        </div>
+        <div _item_id="3">
+            <pre><code class="language-python">
+import torch
+import torch.nn as nn
+
+class SimpleNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(784, 10)
+    
+    def forward(self, x):
+        return self.fc(x)
+            </code></pre>
+        </div>
+        """,
+        "groundtruth_content": """# 深度学习基础教程
+
+深度学习是机器学习的一个重要分支，通过多层神经网络来学习数据的表征。
+
+## 核心概念
+
+神经网络由多个层组成，每层包含多个神经元。
+
+```python
+import torch
+import torch.nn as nn
+
+class SimpleNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(784, 10)
+    
+    def forward(self, x):
+        return self.fc(x)
+```""",
+        "groundtruth_content_list": [
+            {"type": "heading", "content": "深度学习基础教程", "level": 1},
+            {"type": "paragraph", "content": "深度学习是机器学习的一个重要分支，通过多层神经网络来学习数据的表征。"},
+            {"type": "heading", "content": "核心概念", "level": 2},
+            {"type": "paragraph", "content": "神经网络由多个层组成，每层包含多个神经元。"},
+            {"type": "code", "content": "import torch\nimport torch.nn as nn\n\nclass SimpleNet(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.fc = nn.Linear(784, 10)\n    \n    def forward(self, x):\n        return self.fc(x)", "language": "python"}
+        ]
+    }
+    # samples.append(DataSample.from_dict(sample_1_data))
+    
+    # 样本2: 包含表格的预处理HTML
+    sample_2_data = {
+        "id": "preprocessed_sample_2", 
+        "html": """<html><body><h1>原始表格页面</h1><table>...</table></body></html>""",
+        "llm_webkit_html": """
+        <div _item_id="1">
+            <h1>模型性能对比</h1>
+            <p>以下是不同深度学习模型在CIFAR-10数据集上的表现：</p>
+        </div>
+        <div _item_id="2">
+            <table>
+                <thead>
+                    <tr>
+                        <th>模型</th>
+                        <th>准确率</th>
+                        <th>参数量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ResNet-18</td>
+                        <td>95.3%</td>
+                        <td>11.7M</td>
+                    </tr>
+                    <tr>
+                        <td>VGG-16</td>
+                        <td>92.7%</td>
+                        <td>138M</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        """,
+        "groundtruth_content": """# 模型性能对比
+
+以下是不同深度学习模型在CIFAR-10数据集上的表现：
+
+| 模型 | 准确率 | 参数量 |
+|------|--------|--------|
+| ResNet-18 | 95.3% | 11.7M |
+| VGG-16 | 92.7% | 138M |""",
+        "groundtruth_content_list": [
+            {"type": "heading", "content": "模型性能对比", "level": 1},
+            {"type": "paragraph", "content": "以下是不同深度学习模型在CIFAR-10数据集上的表现："},
+            {"type": "table", "content": "| 模型 | 准确率 | 参数量 |\n|------|--------|---------|\n| ResNet-18 | 95.3% | 11.7M |\n| VGG-16 | 92.7% | 138M |"}
+        ]
+    }
+    # samples.append(DataSample.from_dict(sample_2_data))
+    #
+    # # 创建数据集并添加样本
+    # dataset = BenchmarkDataset(name="preprocessed_html_test", description="预处理HTML功能测试数据集")
+
+
+
+    # 本地加载数据集
+    jsonl_file_path = "/home/lulindong/Pycharm_projects/cc/WebMainBench_llm-webkit_v1_WebMainBench_dataset_merge_with_llm_webkit.jsonl"
+
+    # 使用DataLoader加载本地JSONL数据
+    dataset = DataLoader.load_jsonl(jsonl_file_path)
+    for sample in samples:
+        dataset.add_sample(sample)
+    
+    print(f"✅ 测试数据集包含 {len(dataset)} 个样本")
+    print("📋 每个样本都包含:")
+    print("  - html: 原始复杂HTML")
+    print("  - llm_webkit_html: 预处理后的简化HTML（包含_item_id标记）")
+    print("  - groundtruth_content: 标准答案")
+    print()
+    
+    # 2. 创建预处理HTML模式的LLM-WebKit抽取器
+    print("2. 创建预处理HTML模式的LLM-WebKit抽取器...")
+    
+    config = {
+        "use_preprocessed_html": True,          # 🔑 关键配置：启用预处理HTML模式
+        "preprocessed_html_field": "llm_webkit_html"  # 指定预处理HTML字段名
+    }
+    
+    extractor = ExtractorFactory.create("llm-webkit", config=config)
+    print(f"✅ 抽取器创建成功")
+    print(f"📋 配置信息:")
+    print(f"  - use_preprocessed_html: {extractor.inference_config.use_preprocessed_html}")
+    print(f"  - preprocessed_html_field: {extractor.inference_config.preprocessed_html_field}")
+    print(f"  - 跳过LLM推理: 是（直接处理预处理HTML）")
+    print()
+    
+    # 3. 性能对比：展示预处理HTML模式的优势
+    print("3. 性能优势演示...")
+    print("🚀 预处理HTML模式的优势:")
+    print("  ✅ 无需加载大型LLM模型（节省内存）")
+    print("  ✅ 跳过HTML简化推理步骤（节省时间）")
+    print("  ✅ 只需要基础的llm_web_kit依赖")
+    print("  ✅ 适合批量处理已预处理的数据")
+    print()
+    
+    # 4. 运行评测
+    print("4. 开始评测...")
+    print("=" * 50)
+    
+    evaluator = Evaluator()
+    result = evaluator.evaluate(
+        dataset=dataset,
+        extractor=extractor,
+        max_samples=None
+    )
+    
+    # 5. 显示评测结果
+    print("\n5. 📊 预处理HTML模式评测结果:")
+    print("=" * 50)
+    
+    results_dict = result.to_dict()
+    metrics = results_dict.get('overall_metrics', {})
+    
+    # 显示关键指标
+    print(f"\n🏆 综合指标:")
+    print(f"  overall: {metrics.get('overall', 0):.4f}")
+    
+    print(f"\n📝 内容提取质量:")
+    print(f"  text_edit: {metrics.get('text_edit', 0):.4f}")
+    print(f"  code_edit: {metrics.get('code_edit', 0):.4f}")
+    print(f"  table_edit: {metrics.get('table_edit', 0):.4f}")
+    print(f"  table_TEDS: {metrics.get('table_TEDS', 0):.4f}")
+    
+    print(f"\n⚡ 性能统计:")
+    sample_results = results_dict.get('sample_results', [])
+    if sample_results:
+        extraction_times = [s.get('extraction_time', 0) for s in sample_results if s.get('extraction_success')]
+        if extraction_times:
+            avg_time = sum(extraction_times) / len(extraction_times)
+            print(f"  平均提取时间: {avg_time:.3f}秒")
+            print(f"  处理速度: {1/avg_time:.1f}样本/秒")
+    
+    success_count = len([s for s in sample_results if s.get('extraction_success', False)])
+    print(f"  成功样本数: {success_count}/{len(dataset)}")
+    
+    # 6. 展示样本提取结果
+    print(f"\n6. 📄 样本提取结果预览:")
+    print("-" * 50)
+    
+    for i, sample_result in enumerate(sample_results[:2]):  # 只显示前2个样本
+        print(f"\n样本 {i+1}: {sample_result.get('sample_id', 'Unknown')}")
+        if sample_result.get('extraction_success'):
+            content = sample_result.get('extracted_content', '')
+            preview = content[:100].replace('\n', ' ') if content else '无内容'
+            print(f"  ✅ 提取成功")
+            print(f"  📝 内容预览: {preview}...")
+            print(f"  ⏱️  提取时间: {sample_result.get('extraction_time', 0):.3f}秒")
+        else:
+            print(f"  ❌ 提取失败")
+    
+    # 7. 保存结果
+    print(f"\n7. 💾 保存评测结果...")
+    
+    results_dir = Path("results")
+    results_dir.mkdir(exist_ok=True)
+    
+    results_path = results_dir / "preprocessed_html_evaluation_results.json"
+    report_path = results_dir / "preprocessed_html_evaluation_report.csv"
+    
+    DataSaver.save_evaluation_results(result, results_path)
+    DataSaver.save_summary_report(result, report_path)
+    
+    print(f"✅ 详细结果已保存到: {results_path}")
+    print(f"✅ CSV报告已保存到: {report_path}")
+    
+    # 8. 使用建议
+    print(f"\n8. 💡 实际使用建议:")
+    print("=" * 50)
+    print("🔧 何时使用预处理HTML模式:")
+    print("  1. 已有LLM简化后的HTML数据")
+    print("  2. 需要批量处理大量数据")
+    print("  3. 部署环境内存有限")
+    print("  4. 对提取速度有较高要求")
+    print()
+    print("📝 数据准备要求:")
+    print("  1. 确保预处理HTML包含_item_id属性")
+    print("  2. 保持原始HTML作为备用")
+    print("  3. 验证预处理质量")
+    print()
+    print("⚙️  配置参数说明:")
+    print("  - use_preprocessed_html: True/False")
+    print("  - preprocessed_html_field: 字段名（默认'llm_webkit_html'）")
+    
+    print("\n✅ 预处理HTML功能演示完成！")
+
+
 if __name__ == "__main__":
     try:
         # demo_basic_mock_evaluation()
         # demo_llm_webkit_evaluation()  # 使用LLM-WebKit评测示例
+        demo_llm_webkit_with_preprocessed_html_evaluation()
         # demo_extractor_comparison()
         # demo_dataset_with_extraction()  # 演示保存带有抽取内容的数据集
-        demo_multi_extraction() # 演示多个抽取器同时评测
+        # demo_multi_extraction() # 演示多个抽取器同时评测
         # demo_lld_workers_extraction()
         print("\n✅ 示例运行完成！")
         
