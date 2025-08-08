@@ -953,137 +953,50 @@ def demo_llm_webkit_with_preprocessed_html_evaluation():
     # 设置日志
     setup_logging(level="INFO")
     
-    # 1. 创建包含预处理HTML的测试数据集
-    print("1. 创建包含预处理HTML的测试数据集...")
+    # 1. 从真实数据集加载包含预处理HTML的数据
+    print("1. 从真实数据集加载预处理HTML数据...")
     
-    samples = []
+    # 使用DataLoader加载真实的样本数据
+    dataset_path = Path("data/WebMainBench_dataset_sample2.jsonl")
+    print(f"📂 数据集文件: {dataset_path}")
     
-    # 样本1: 包含预处理的HTML（模拟第一阶段LLM简化后的结果）
-    sample_1_data = {
-        "id": "preprocessed_sample_1",
-        "html": """<html><body><h1>原始复杂HTML</h1><p>这里是原始的复杂HTML内容...</p></body></html>""",
-        # 这是关键：包含llm_webkit_html字段（预处理后的简化HTML）
-        "llm_webkit_html": """
-        <div _item_id="1">
-            <h1>深度学习基础教程</h1>
-            <p>深度学习是机器学习的一个重要分支，通过多层神经网络来学习数据的表征。</p>
-        </div>
-        <div _item_id="2">
-            <h2>核心概念</h2>
-            <p>神经网络由多个层组成，每层包含多个神经元。</p>
-        </div>
-        <div _item_id="3">
-            <pre><code class="language-python">
-import torch
-import torch.nn as nn
-
-class SimpleNet(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc = nn.Linear(784, 10)
+    if not dataset_path.exists():
+        print(f"❌ 数据文件不存在: {dataset_path}")
+        print("请确保已运行数据提取命令创建样本数据集")
+        return
     
-    def forward(self, x):
-        return self.fc(x)
-            </code></pre>
-        </div>
-        """,
-        "groundtruth_content": """# 深度学习基础教程
+    # 加载数据集
+    dataset = DataLoader.load_jsonl(dataset_path, include_results=False)
+    dataset.name = "real_preprocessed_html_test"
+    dataset.description = "基于真实数据的预处理HTML功能测试"
 
-深度学习是机器学习的一个重要分支，通过多层神经网络来学习数据的表征。
-
-## 核心概念
-
-神经网络由多个层组成，每层包含多个神经元。
-
-```python
-import torch
-import torch.nn as nn
-
-class SimpleNet(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc = nn.Linear(784, 10)
     
-    def forward(self, x):
-        return self.fc(x)
-```""",
-        "groundtruth_content_list": [
-            {"type": "heading", "content": "深度学习基础教程", "level": 1},
-            {"type": "paragraph", "content": "深度学习是机器学习的一个重要分支，通过多层神经网络来学习数据的表征。"},
-            {"type": "heading", "content": "核心概念", "level": 2},
-            {"type": "paragraph", "content": "神经网络由多个层组成，每层包含多个神经元。"},
-            {"type": "code", "content": "import torch\nimport torch.nn as nn\n\nclass SimpleNet(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.fc = nn.Linear(784, 10)\n    \n    def forward(self, x):\n        return self.fc(x)", "language": "python"}
-        ]
-    }
-    # samples.append(DataSample.from_dict(sample_1_data))
+    print(f"✅ 真实数据集加载成功，包含 {len(dataset)} 个样本")
+    print("📋 真实数据样本包含:")
+    print("  - html: 原始网页HTML")
+    print("  - llm_webkit_html: LLM预处理后的简化HTML（包含_item_id标记）")
+    print("  - groundtruth_content: 人工标注的标准答案")
+    print("  - llm_webkit_md: LLM提取的markdown内容")
     
-    # 样本2: 包含表格的预处理HTML
-    sample_2_data = {
-        "id": "preprocessed_sample_2", 
-        "html": """<html><body><h1>原始表格页面</h1><table>...</table></body></html>""",
-        "llm_webkit_html": """
-        <div _item_id="1">
-            <h1>模型性能对比</h1>
-            <p>以下是不同深度学习模型在CIFAR-10数据集上的表现：</p>
-        </div>
-        <div _item_id="2">
-            <table>
-                <thead>
-                    <tr>
-                        <th>模型</th>
-                        <th>准确率</th>
-                        <th>参数量</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>ResNet-18</td>
-                        <td>95.3%</td>
-                        <td>11.7M</td>
-                    </tr>
-                    <tr>
-                        <td>VGG-16</td>
-                        <td>92.7%</td>
-                        <td>138M</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        """,
-        "groundtruth_content": """# 模型性能对比
-
-以下是不同深度学习模型在CIFAR-10数据集上的表现：
-
-| 模型 | 准确率 | 参数量 |
-|------|--------|--------|
-| ResNet-18 | 95.3% | 11.7M |
-| VGG-16 | 92.7% | 138M |""",
-        "groundtruth_content_list": [
-            {"type": "heading", "content": "模型性能对比", "level": 1},
-            {"type": "paragraph", "content": "以下是不同深度学习模型在CIFAR-10数据集上的表现："},
-            {"type": "table", "content": "| 模型 | 准确率 | 参数量 |\n|------|--------|---------|\n| ResNet-18 | 95.3% | 11.7M |\n| VGG-16 | 92.7% | 138M |"}
-        ]
-    }
-    # samples.append(DataSample.from_dict(sample_2_data))
-    #
-    # # 创建数据集并添加样本
-    # dataset = BenchmarkDataset(name="preprocessed_html_test", description="预处理HTML功能测试数据集")
-
-
-
-    # 本地加载数据集
-    jsonl_file_path = "/home/lulindong/Pycharm_projects/cc/WebMainBench_llm-webkit_v1_WebMainBench_dataset_merge_with_llm_webkit.jsonl"
-
-    # 使用DataLoader加载本地JSONL数据
-    dataset = DataLoader.load_jsonl(jsonl_file_path)
-    for sample in samples:
-        dataset.add_sample(sample)
-    
-    print(f"✅ 测试数据集包含 {len(dataset)} 个样本")
-    print("📋 每个样本都包含:")
-    print("  - html: 原始复杂HTML")
-    print("  - llm_webkit_html: 预处理后的简化HTML（包含_item_id标记）")
-    print("  - groundtruth_content: 标准答案")
+    # 显示第一个样本的预览
+    if len(dataset.samples) > 0:
+        first_sample = dataset.samples[0]
+        sample_dict = first_sample.to_dict()
+        
+        print(f"\n🔍 第一个样本预览:")
+        print(f"  - ID: {sample_dict.get('track_id', 'N/A')}")
+        print(f"  - URL: {sample_dict.get('url', 'N/A')[:60]}...")
+        
+        # 检查是否有llm_webkit_html字段
+        if hasattr(first_sample, 'llm_webkit_html') or 'llm_webkit_html' in sample_dict:
+            llm_html = getattr(first_sample, 'llm_webkit_html', sample_dict.get('llm_webkit_html', ''))
+            if llm_html:
+                print(f"  - 预处理HTML长度: {len(llm_html)} 字符")
+                print(f"  - 包含_item_id数量: {llm_html.count('_item_id')}")
+            else:
+                print(f"  - ⚠️  预处理HTML字段为空")
+        else:
+            print(f"  - ❌ 未找到llm_webkit_html字段")
     print()
     
     # 2. 创建预处理HTML模式的LLM-WebKit抽取器
