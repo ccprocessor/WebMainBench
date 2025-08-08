@@ -39,37 +39,45 @@ class TEDSMetric(BaseMetric):
             MetricResult with TEDS score
         """
         try:
-            # Convert inputs to HTML format
+            # 新增：检查 table_edit 的计算结果
+            table_edit_result = kwargs.get('table_edit_result')
+            if table_edit_result is None:
+                return MetricResult.create_error_result(
+                    self.name, "Missing table_edit result in kwargs"
+                )
+            if not table_edit_result.success:
+                # 若 table_edit 失败，TEDS 直接返回失败
+                return MetricResult.create_error_result(
+                    self.name,
+                    f"Skipped due to table_edit failure: {table_edit_result.details.get('error', 'unknown reason')}"
+                )
+
+            # 原有逻辑：转换为HTML并解析树结构
             pred_html = self._normalize_to_html(predicted)
             gt_html = self._normalize_to_html(groundtruth)
-            
-            # Parse HTML to tree structures
+
             pred_tree = self._parse_html_table(pred_html)
             gt_tree = self._parse_html_table(gt_html)
-            
+
+            # 后续逻辑保持不变...
             if pred_tree is None and gt_tree is None:
-                # Both are empty/invalid tables
                 return MetricResult(
                     metric_name=self.name,
                     score=1.0,
                     details={"note": "Both tables are empty or invalid"}
                 )
-            
+
             if pred_tree is None or gt_tree is None:
-                # One is empty/invalid
                 return MetricResult(
                     metric_name=self.name,
                     score=0.0,
                     details={"note": "One table is empty or invalid"}
                 )
-            
-            # Calculate tree edit distance
+
             edit_distance = self._tree_edit_distance(pred_tree, gt_tree)
-            
-            # Calculate TEDS score
             max_nodes = max(self._count_nodes(pred_tree), self._count_nodes(gt_tree))
             teds_score = 1.0 - (edit_distance / max_nodes) if max_nodes > 0 else 1.0
-            
+
             details = {
                 "edit_distance": edit_distance,
                 "predicted_nodes": self._count_nodes(pred_tree),
@@ -78,17 +86,68 @@ class TEDSMetric(BaseMetric):
                 "structure_only": self.structure_only,
                 "algorithm": "TEDS"
             }
-            
+
             return MetricResult(
                 metric_name=self.name,
-                score=max(0.0, min(1.0, teds_score)),  # Clamp to [0, 1]
+                score=max(0.0, min(1.0, teds_score)),
                 details=details
             )
-            
+
         except Exception as e:
             return MetricResult.create_error_result(
                 self.name, f"TEDS calculation failed: {str(e)}"
             )
+        # try:
+        #     # Convert inputs to HTML format
+        #     pred_html = self._normalize_to_html(predicted)
+        #     gt_html = self._normalize_to_html(groundtruth)
+        #
+        #     # Parse HTML to tree structures
+        #     pred_tree = self._parse_html_table(pred_html)
+        #     gt_tree = self._parse_html_table(gt_html)
+        #
+        #     if pred_tree is None and gt_tree is None:
+        #         # Both are empty/invalid tables
+        #         return MetricResult(
+        #             metric_name=self.name,
+        #             score=1.0,
+        #             details={"note": "Both tables are empty or invalid"}
+        #         )
+        #
+        #     if pred_tree is None or gt_tree is None:
+        #         # One is empty/invalid
+        #         return MetricResult(
+        #             metric_name=self.name,
+        #             score=0.0,
+        #             details={"note": "One table is empty or invalid"}
+        #         )
+        #
+        #     # Calculate tree edit distance
+        #     edit_distance = self._tree_edit_distance(pred_tree, gt_tree)
+        #
+        #     # Calculate TEDS score
+        #     max_nodes = max(self._count_nodes(pred_tree), self._count_nodes(gt_tree))
+        #     teds_score = 1.0 - (edit_distance / max_nodes) if max_nodes > 0 else 1.0
+        #
+        #     details = {
+        #         "edit_distance": edit_distance,
+        #         "predicted_nodes": self._count_nodes(pred_tree),
+        #         "groundtruth_nodes": self._count_nodes(gt_tree),
+        #         "max_nodes": max_nodes,
+        #         "structure_only": self.structure_only,
+        #         "algorithm": "TEDS"
+        #     }
+        #
+        #     return MetricResult(
+        #         metric_name=self.name,
+        #         score=max(0.0, min(1.0, teds_score)),  # Clamp to [0, 1]
+        #         details=details
+        #     )
+        #
+        # except Exception as e:
+        #     return MetricResult.create_error_result(
+        #         self.name, f"TEDS calculation failed: {str(e)}"
+        #     )
     
     def _normalize_to_html(self, table_data: Any) -> str:
         """Convert various table formats to HTML."""

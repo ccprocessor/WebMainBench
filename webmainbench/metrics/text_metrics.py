@@ -40,20 +40,41 @@ class EditDistanceMetric(BaseMetric):
         # Normalize by the length of the longer string
         if self.normalize:
             max_len = max(len(predicted), len(groundtruth))
+            # if max_len == 0:
+            #     score = 1.0  # Both strings are empty
+            # else:
+            #     score = 1.0 - (distance / max_len)
             if max_len == 0:
-                score = 1.0  # Both strings are empty
-            else:
-                score = 1.0 - (distance / max_len)
+                # 两者都为空时标记为失败
+                return MetricResult.create_error_result(
+                    self.name,
+                    "Both predicted and groundtruth are empty"
+                )
+
+            score = 1.0 - (distance / max_len)
+            return MetricResult(
+                metric_name=self.name,
+                score=score,
+                details={
+                    "distance": distance,
+                    "predicted_length": len(predicted),
+                    "groundtruth_length": len(groundtruth),
+                    "normalized": True
+                }
+            )
         else:
             score = distance
-        
+
+
+
         details = {
             "distance": distance,
             "predicted_length": len(predicted),
             "groundtruth_length": len(groundtruth),
             "normalized": self.normalize,
         }
-        
+
+
         return MetricResult(
             metric_name=self.name,
             score=score,

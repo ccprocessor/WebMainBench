@@ -796,13 +796,15 @@ def demo_multi_extraction():
     from webmainbench import DataLoader, DataSaver, Evaluator, ExtractorFactory
     from pathlib import Path
     import time
+
+
     # 设置日志
     setup_logging(level="INFO")
 
     # 配置文件路径
     data_dir = Path("../data")
-    dataset_path = data_dir / "sample_dataset.jsonl"
-    # dataset_path = "/home/lulindong/Pycharm_projects/cc/test.jsonl"
+    # dataset_path = data_dir / "sample_dataset.jsonl"
+    dataset_path = "/home/lulindong/Pycharm_projects/cc/WebMainBench_llm-webkit_v1_WebMainBench_dataset_merge_with_llm_webkit.jsonl"
 
     print(f"📂 数据集文件: {dataset_path}")
 
@@ -815,7 +817,6 @@ def demo_multi_extraction():
             "list_bullets": True,
             "preserve_formatting": True
         }},
-
         {"name": "trafilatura", "config": {}},
         {"name": "magic-html", "config": {}},
     ]
@@ -902,7 +903,7 @@ def demo_multi_extraction():
         all_results.append(result)
 
         # 保存带有当前抽取器内容的数据集
-        enriched_dataset_path = results_dir / f"{dataset.name}_with_{extractor.name}_extraction.jsonl"
+        enriched_dataset_path = results_dir / f"{dataset.name}_{extractor.name}_extraction_infer.jsonl"
         DataSaver.save_dataset_with_extraction(
             results=result,
             dataset=dataset,
@@ -1014,7 +1015,7 @@ class SimpleNet(nn.Module):
             {"type": "code", "content": "import torch\nimport torch.nn as nn\n\nclass SimpleNet(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.fc = nn.Linear(784, 10)\n    \n    def forward(self, x):\n        return self.fc(x)", "language": "python"}
         ]
     }
-    samples.append(DataSample.from_dict(sample_1_data))
+    # samples.append(DataSample.from_dict(sample_1_data))
     
     # 样本2: 包含表格的预处理HTML
     sample_2_data = {
@@ -1063,10 +1064,18 @@ class SimpleNet(nn.Module):
             {"type": "table", "content": "| 模型 | 准确率 | 参数量 |\n|------|--------|---------|\n| ResNet-18 | 95.3% | 11.7M |\n| VGG-16 | 92.7% | 138M |"}
         ]
     }
-    samples.append(DataSample.from_dict(sample_2_data))
-    
-    # 创建数据集并添加样本
-    dataset = BenchmarkDataset(name="preprocessed_html_test", description="预处理HTML功能测试数据集")
+    # samples.append(DataSample.from_dict(sample_2_data))
+    #
+    # # 创建数据集并添加样本
+    # dataset = BenchmarkDataset(name="preprocessed_html_test", description="预处理HTML功能测试数据集")
+
+
+
+    # 本地加载数据集
+    jsonl_file_path = "/home/lulindong/Pycharm_projects/cc/WebMainBench_llm-webkit_v1_WebMainBench_dataset_merge_with_llm_webkit.jsonl"
+
+    # 使用DataLoader加载本地JSONL数据
+    dataset = DataLoader.load_jsonl(jsonl_file_path)
     for sample in samples:
         dataset.add_sample(sample)
     
