@@ -804,7 +804,7 @@ def demo_multi_extraction():
     # 配置文件路径
     data_dir = Path("../data")
     # dataset_path = data_dir / "sample_dataset.jsonl"
-    dataset_path = "/home/lulindong/Pycharm_projects/cc/WebMainBench_llm-webkit_v1_WebMainBench_dataset_merge_with_llm_webkit.jsonl"
+    dataset_path = "/home/lulindong/Pycharm_projects/cc/test_10.jsonl"
 
     print(f"📂 数据集文件: {dataset_path}")
 
@@ -947,17 +947,17 @@ def demo_multi_extraction():
 
 def demo_llm_webkit_with_preprocessed_html_evaluation():
     """演示LLM-WebKit预处理HTML功能的评测"""
-    
+
     print("\n=== LLM-WebKit 预处理HTML功能演示 ===\n")
-    
+
     # 设置日志
     setup_logging(level="INFO")
-    
+
     # 1. 创建包含预处理HTML的测试数据集
     print("1. 创建包含预处理HTML的测试数据集...")
-    
+
     samples = []
-    
+
     # 样本1: 包含预处理的HTML（模拟第一阶段LLM简化后的结果）
     sample_1_data = {
         "id": "preprocessed_sample_1",
@@ -1016,10 +1016,10 @@ class SimpleNet(nn.Module):
         ]
     }
     # samples.append(DataSample.from_dict(sample_1_data))
-    
+
     # 样本2: 包含表格的预处理HTML
     sample_2_data = {
-        "id": "preprocessed_sample_2", 
+        "id": "preprocessed_sample_2",
         "html": """<html><body><h1>原始表格页面</h1><table>...</table></body></html>""",
         "llm_webkit_html": """
         <div _item_id="1">
@@ -1065,8 +1065,8 @@ class SimpleNet(nn.Module):
         ]
     }
     # samples.append(DataSample.from_dict(sample_2_data))
-    #
-    # # 创建数据集并添加样本
+
+    # 创建数据集并添加样本
     # dataset = BenchmarkDataset(name="preprocessed_html_test", description="预处理HTML功能测试数据集")
 
 
@@ -1076,24 +1076,26 @@ class SimpleNet(nn.Module):
 
     # 使用DataLoader加载本地JSONL数据
     dataset = DataLoader.load_jsonl(jsonl_file_path)
-    for sample in samples:
-        dataset.add_sample(sample)
-    
+    # for sample in samples:
+    #     dataset.add_sample(sample)
+        # 在评测前添加，验证抽取器是否使用了正确的HTML字段
+
+
     print(f"✅ 测试数据集包含 {len(dataset)} 个样本")
     print("📋 每个样本都包含:")
     print("  - html: 原始复杂HTML")
     print("  - llm_webkit_html: 预处理后的简化HTML（包含_item_id标记）")
     print("  - groundtruth_content: 标准答案")
     print()
-    
+
     # 2. 创建预处理HTML模式的LLM-WebKit抽取器
     print("2. 创建预处理HTML模式的LLM-WebKit抽取器...")
-    
+
     config = {
         "use_preprocessed_html": True,          # 🔑 关键配置：启用预处理HTML模式
         "preprocessed_html_field": "llm_webkit_html"  # 指定预处理HTML字段名
     }
-    
+
     extractor = ExtractorFactory.create("llm-webkit", config=config)
     print(f"✅ 抽取器创建成功")
     print(f"📋 配置信息:")
@@ -1101,7 +1103,7 @@ class SimpleNet(nn.Module):
     print(f"  - preprocessed_html_field: {extractor.inference_config.preprocessed_html_field}")
     print(f"  - 跳过LLM推理: 是（直接处理预处理HTML）")
     print()
-    
+
     # 3. 性能对比：展示预处理HTML模式的优势
     print("3. 性能优势演示...")
     print("🚀 预处理HTML模式的优势:")
@@ -1110,35 +1112,36 @@ class SimpleNet(nn.Module):
     print("  ✅ 只需要基础的llm_web_kit依赖")
     print("  ✅ 适合批量处理已预处理的数据")
     print()
-    
+
     # 4. 运行评测
     print("4. 开始评测...")
     print("=" * 50)
-    
+
     evaluator = Evaluator()
     result = evaluator.evaluate(
         dataset=dataset,
         extractor=extractor,
         max_samples=None
     )
-    
+
     # 5. 显示评测结果
     print("\n5. 📊 预处理HTML模式评测结果:")
     print("=" * 50)
-    
+
     results_dict = result.to_dict()
     metrics = results_dict.get('overall_metrics', {})
-    
+
     # 显示关键指标
     print(f"\n🏆 综合指标:")
     print(f"  overall: {metrics.get('overall', 0):.4f}")
-    
+
     print(f"\n📝 内容提取质量:")
+    print(f"  formula_edit: {metrics.get('formula_edit', 0):.4f}")
     print(f"  text_edit: {metrics.get('text_edit', 0):.4f}")
     print(f"  code_edit: {metrics.get('code_edit', 0):.4f}")
     print(f"  table_edit: {metrics.get('table_edit', 0):.4f}")
     print(f"  table_TEDS: {metrics.get('table_TEDS', 0):.4f}")
-    
+
     print(f"\n⚡ 性能统计:")
     sample_results = results_dict.get('sample_results', [])
     if sample_results:
@@ -1147,14 +1150,14 @@ class SimpleNet(nn.Module):
             avg_time = sum(extraction_times) / len(extraction_times)
             print(f"  平均提取时间: {avg_time:.3f}秒")
             print(f"  处理速度: {1/avg_time:.1f}样本/秒")
-    
+
     success_count = len([s for s in sample_results if s.get('extraction_success', False)])
     print(f"  成功样本数: {success_count}/{len(dataset)}")
-    
+
     # 6. 展示样本提取结果
     print(f"\n6. 📄 样本提取结果预览:")
     print("-" * 50)
-    
+
     for i, sample_result in enumerate(sample_results[:2]):  # 只显示前2个样本
         print(f"\n样本 {i+1}: {sample_result.get('sample_id', 'Unknown')}")
         if sample_result.get('extraction_success'):
@@ -1165,22 +1168,21 @@ class SimpleNet(nn.Module):
             print(f"  ⏱️  提取时间: {sample_result.get('extraction_time', 0):.3f}秒")
         else:
             print(f"  ❌ 提取失败")
-    
     # 7. 保存结果
     print(f"\n7. 💾 保存评测结果...")
-    
+
     results_dir = Path("results")
     results_dir.mkdir(exist_ok=True)
-    
+
     results_path = results_dir / "preprocessed_html_evaluation_results.json"
     report_path = results_dir / "preprocessed_html_evaluation_report.csv"
-    
+
     DataSaver.save_evaluation_results(result, results_path)
     DataSaver.save_summary_report(result, report_path)
-    
+
     print(f"✅ 详细结果已保存到: {results_path}")
     print(f"✅ CSV报告已保存到: {report_path}")
-    
+
     # 8. 使用建议
     print(f"\n8. 💡 实际使用建议:")
     print("=" * 50)
@@ -1198,9 +1200,8 @@ class SimpleNet(nn.Module):
     print("⚙️  配置参数说明:")
     print("  - use_preprocessed_html: True/False")
     print("  - preprocessed_html_field: 字段名（默认'llm_webkit_html'）")
-    
-    print("\n✅ 预处理HTML功能演示完成！")
 
+    print("\n✅ 预处理HTML功能演示完成！")
 
 if __name__ == "__main__":
     try:
