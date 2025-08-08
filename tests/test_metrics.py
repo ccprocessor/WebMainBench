@@ -91,8 +91,8 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         self.assertTrue(code_result.success)
         self.assertIsInstance(code_result.score, float)
         # 验证固定内容的确定分数
-        self.assertAlmostEqual(code_result.score, 0.4591836734693877, places=5,
-                               msg=f"code_edit分数应该是0.4591836734693877，实际: {code_result.score}")
+        self.assertAlmostEqual(code_result.score, 0.918367, places=5,
+                               msg=f"code_edit分数应该是0.918367，实际: {code_result.score}")
 
         # 验证详细信息
         self.assertEqual(code_result.details['content_type'], 'code')
@@ -129,8 +129,8 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         self.assertTrue(table_result.success)
         self.assertIsInstance(table_result.score, float)
         # 验证固定内容的确定分数
-        self.assertAlmostEqual(table_result.score, 1.0, places=5,
-                               msg=f"table_edit分数应该是1.0，实际: {table_result.score}")
+        self.assertAlmostEqual(table_result.score, 0.868852, places=5,
+                               msg=f"table_edit分数应该是0.868852，实际: {table_result.score}")
 
         # 验证详细信息
         self.assertEqual(table_result.details['content_type'], 'table')
@@ -147,8 +147,8 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         self.assertTrue(teds_result.success)
         self.assertIsInstance(teds_result.score, float)
         # 验证固定内容的确定分数
-        self.assertAlmostEqual(teds_result.score, 1.0, places=5,
-                               msg=f"table_TEDS分数应该是1.0，实际: {teds_result.score}")
+        self.assertAlmostEqual(teds_result.score, 0.300000, places=5,
+                               msg=f"table_TEDS分数应该是0.300000，实际: {teds_result.score}")
 
         # 验证详细信息
         self.assertEqual(teds_result.details['content_type'], 'table')
@@ -164,8 +164,8 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         self.assertTrue(text_result.success)
         self.assertIsInstance(text_result.score, float)
         # 验证固定内容的确定分数
-        self.assertAlmostEqual(text_result.score, 0.7378640776699029, places=5,
-                               msg=f"text_edit分数应该是0.7378640776699029，实际: {text_result.score}")
+        self.assertAlmostEqual(text_result.score, 0.769231, places=5,
+                               msg=f"text_edit分数应该是0.769231，实际: {text_result.score}")
 
         # 验证详细信息
         self.assertEqual(text_result.details['content_type'], 'text')
@@ -305,8 +305,8 @@ def hello_world():
         # 验证代码编辑距离（缺少python标识符导致轻微差异）
         self.assertIn("code_edit", results)
         self.assertTrue(results["code_edit"].success)
-        self.assertAlmostEqual(results["code_edit"].score, 0.9178082191780822, places=5,
-                               msg=f"code_edit分数应该是0.9178082191780822，实际: {results['code_edit'].score}")
+        self.assertAlmostEqual(results["code_edit"].score, 0.905797, places=5,
+                               msg=f"code_edit分数应该是0.905797，实际: {results['code_edit'].score}")
 
     def test_table_sample_edit_distance(self):
         """测试表格样本的编辑距离"""
@@ -331,15 +331,15 @@ def hello_world():
 
         # 验证表格编辑距离（分隔符长度差异导致的固定分数）
         self.assertIn("table_edit", results)
-        # self.assertTrue(results["table_edit"].success) # 方法变了需要重新测试
-        self.assertAlmostEqual(results["table_edit"].score, 0.0, places=5,
-                               msg=f"table_edit分数应该是0.0，实际: {results['table_edit'].score}")
+        self.assertTrue(results["table_edit"].success)
+        self.assertAlmostEqual(results["table_edit"].score, 0.888889, places=5,
+                               msg=f"table_edit分数应该是0.888889，实际: {results['table_edit'].score}")
 
         # 验证TEDS指标（表格结构完全相同，满分）
         self.assertIn("table_TEDS", results)
-        # self.assertTrue(results["table_TEDS"].success) # 方法变了需要重新测试
-        self.assertAlmostEqual(results["table_TEDS"].score, 0.0, places=5,
-                               msg=f"table_TEDS分数应该是0.0，实际: {results['table_TEDS'].score}")
+        self.assertTrue(results["table_TEDS"].success)
+        self.assertAlmostEqual(results["table_TEDS"].score, 1.000000, places=5,
+                               msg=f"table_TEDS分数应该是1.000000，实际: {results['table_TEDS'].score}")
 
     def test_formula_sample_edit_distance(self):
         """测试公式样本的编辑距离"""
@@ -366,15 +366,15 @@ $$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$"""
 
         # 验证公式编辑距离（符号转义导致的固定低分）
         self.assertIn("formula_edit", results)
-        # self.assertTrue(results["formula_edit"].success) # 方法变了需要重新测试
-        self.assertAlmostEqual(results["formula_edit"].score, 0.140625, places=5,
-                               msg=f"formula_edit分数应该是0.140625，实际: {results['formula_edit'].score}")
+        self.assertTrue(results["formula_edit"].success)
+        self.assertAlmostEqual(results["formula_edit"].score, 0.000000, places=5,
+                               msg=f"formula_edit分数应该是0.000000，实际: {results['formula_edit'].score}")
 
         # 验证文本编辑距离（去除公式后的纯文本，也受符号转义影响）
         self.assertIn("text_edit", results)
-        # self.assertTrue(results["text_edit"].success) # 方法变了需要重新测试
-        self.assertAlmostEqual(results["text_edit"].score, 0.2564102564102564, places=5,
-                               msg=f"text_edit分数应该是0.2564102564102564，实际: {results['text_edit'].score}")
+        self.assertTrue(results["text_edit"].success)
+        self.assertAlmostEqual(results["text_edit"].score, 0.320000, places=5,
+                               msg=f"text_edit分数应该是0.320000，实际: {results['text_edit'].score}")
 
     def test_overall_score_calculation(self):
         """测试综合分数计算"""
@@ -458,15 +458,15 @@ def test():
 
         for metric in expected_metrics:
             self.assertIn(metric, results, f"指标 {metric} 缺失")
-            # self.assertTrue(results[metric].success, f"指标 {metric} 计算失败")
+            self.assertTrue(results[metric].success, f"指标 {metric} 计算失败")
 
             score = results[metric].score
             print(f"{metric}: {score:.6f}")
 
             # 完全相同的内容应该得到满分 1.0
-            # self.assertAlmostEqual(score, 1.0,
-                                #    places=4,
-                                #    msg=f"完全相同内容的 {metric} 应该得到满分，实际得分: {score}")
+            self.assertAlmostEqual(score, 1.0,
+                                   places=4,
+                                   msg=f"完全相同内容的 {metric} 应该得到满分，实际得分: {score}")
 
         print("✅ 所有指标都正确得到满分!")
 
