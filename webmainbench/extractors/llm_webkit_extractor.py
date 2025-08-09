@@ -587,9 +587,9 @@ Output format should be a JSON-formatted string representing a dictionary where 
     
     def _extract_content_from_main_html(self, main_html: str, url: str = None) -> tuple:
         """使用llm-webkit的方法将main_html提取成content"""
+        import traceback
         try:
             from llm_web_kit.simple import extract_html_to_md
-            import traceback
             
             print(f"🔧 开始使用llm-webkit简单接口提取content...")
             
@@ -604,9 +604,9 @@ Output format should be a JSON-formatted string representing a dictionary where 
         except Exception as e:
             print(f"❌ llm-webkit提取失败: {e}")
             print(f"❌ 错误详情: {traceback.format_exc()}")
-            return "", []
+            raise RuntimeError(f"llm-webkit提取失败: {str(e)}") from e
     
-
+    
     def _extract_content(self, html: str, url: str = None) -> ExtractionResult:
         """
         使用高级LLM推理提取内容.
@@ -721,9 +721,11 @@ Output format should be a JSON-formatted string representing a dictionary where 
             
         except Exception as e:
             extraction_time = time.time() - start_time
+            import traceback
             return ExtractionResult.create_error_result(
                 f"LLM-WebKit extraction failed: {str(e)}",
-                extraction_time=extraction_time
+                traceback.format_exc(),
+                extraction_time
             )
     
     def _extract_title(self, html: str) -> Optional[str]:
