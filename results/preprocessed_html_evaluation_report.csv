@@ -1,2 +1,2 @@
 extractor,dataset,total_samples,success_rate,overall,code_edit,formula_edit,table_TEDS,table_edit,text_edit
-llm-webkit,preprocessed_html_test,2,1.0,0.5029,0.5,1.0,0.5,0.5,0.0143
+llm-webkit,real_preprocessed_html_test,2,1.0,0.1042,0.0,0.0,0.0,0.0,0.521

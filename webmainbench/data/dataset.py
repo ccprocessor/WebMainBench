@@ -28,6 +28,7 @@ class DataSample:
     difficulty: Optional[str] = None  # easy, medium, hard
     tags: Optional[List[str]] = None
     llm_webkit_md: Optional[str] = None
+    llm_webkit_html: Optional[str] = None  # 预处理HTML字段
     
     # Extracted results (populated during evaluation)
     extracted_results: Optional[Dict[str, Any]] = None
@@ -42,6 +43,7 @@ class DataSample:
             "content_list": self.content_list,
             "content": self.content,
             "llm_webkit_md": self.llm_webkit_md,
+            "llm_webkit_html": self.llm_webkit_html,
             "url": self.url,
             "domain": self.domain,
             "language": self.language,
