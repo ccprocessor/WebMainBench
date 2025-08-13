@@ -804,7 +804,7 @@ def demo_multi_extraction():
     # 配置文件路径
     data_dir = Path("../data")
     # dataset_path = data_dir / "sample_dataset.jsonl"
-    dataset_path = "/home/lulindong/Pycharm_projects/cc/WebMainBench_llm-webkit_v1_WebMainBench_dataset_merge_with_llm_webkit.jsonl"
+    dataset_path = "/home/lulindong/Pycharm_projects/cc/WebMainBench_2456_v1_WebMainBench_dataset_merge_with_llm_webkit.jsonl"
 
     print(f"📂 数据集文件: {dataset_path}")
 
@@ -957,7 +957,7 @@ def demo_llm_webkit_with_preprocessed_html_evaluation():
     print("1. 从真实数据集加载预处理HTML数据...")
     
     # 使用DataLoader加载真实的样本数据
-    dataset_path = Path("data/WebMainBench_dataset_sample2.jsonl")
+    dataset_path = Path("/home/lulindong/Pycharm_projects/cc/WebMainBench_2456_v1_WebMainBench_dataset_merge_with_llm_webkit.jsonl")
     print(f"📂 数据集文件: {dataset_path}")
     
     if not dataset_path.exists():
@@ -969,7 +969,6 @@ def demo_llm_webkit_with_preprocessed_html_evaluation():
     dataset = DataLoader.load_jsonl(dataset_path, include_results=False)
     dataset.name = "real_preprocessed_html_test"
     dataset.description = "基于真实数据的预处理HTML功能测试"
-
     
     print(f"✅ 真实数据集加载成功，包含 {len(dataset)} 个样本")
     print("📋 真实数据样本包含:")
@@ -1078,15 +1077,22 @@ def demo_llm_webkit_with_preprocessed_html_evaluation():
             print(f"  ⏱️  提取时间: {sample_result.get('extraction_time', 0):.3f}秒")
         else:
             print(f"  ❌ 提取失败")
-    
     # 7. 保存结果
     print(f"\n7. 💾 保存评测结果...")
     
     results_dir = Path("results")
     results_dir.mkdir(exist_ok=True)
-    
-    results_path = results_dir / "preprocessed_html_evaluation_results.json"
-    report_path = results_dir / "preprocessed_html_evaluation_report.csv"
+    # 新增：保存带抽取结果的增强数据集（JSONL格式）
+    jsonl_dataset_path = results_dir / f"{extractor.name}_preprocessed_html_dataset_with_results.jsonl"
+    DataSaver.save_dataset_with_extraction(
+        results=result,
+        dataset=dataset,  # 原始数据集对象
+        file_path=jsonl_dataset_path,
+        extractor_name="llm-webkit"  # 抽取器名称前缀
+    )
+    print(f"✅ 带抽取结果的JSONL数据集已保存到: {jsonl_dataset_path}")
+    results_path = results_dir / f"{extractor.name}_preprocessed_html_evaluation_results.json"
+    report_path = results_dir / f"{extractor.name}_preprocessed_html_evaluation_report.csv"
     
     DataSaver.save_evaluation_results(result, results_path)
     DataSaver.save_summary_report(result, report_path)
@@ -1119,10 +1125,10 @@ if __name__ == "__main__":
     try:
         # demo_basic_mock_evaluation()
         # demo_llm_webkit_evaluation()  # 使用LLM-WebKit评测示例
-        demo_llm_webkit_with_preprocessed_html_evaluation()
+        # demo_llm_webkit_with_preprocessed_html_evaluation()
         # demo_extractor_comparison()
         # demo_dataset_with_extraction()  # 演示保存带有抽取内容的数据集
-        # demo_multi_extraction() # 演示多个抽取器同时评测
+        demo_multi_extraction() # 演示多个抽取器同时评测
         # demo_lld_workers_extraction()
         print("\n✅ 示例运行完成！")
         
