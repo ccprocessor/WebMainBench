@@ -80,9 +80,11 @@ class TestTableExtraction(unittest.TestCase):
         result = self.metric._extract_from_markdown(text)
         
         # 验证HTML表格被提取
-        self.assertIn('<table>', result['table'])
-        self.assertIn('<tr>', result['table'])
-        self.assertIn('标题1', result['table'])
+        expected_table = """<table>
+<tr><th>标题1</th><th>标题2</th></tr>
+<tr><td>数据1</td><td>数据2</td></tr>
+</table>"""
+        self.assertIn(expected_table, result['table'])
         
         # 验证文本中HTML表格被移除
         self.assertNotIn('<table>', result['text'])
@@ -102,9 +104,12 @@ class TestTableExtraction(unittest.TestCase):
         result = self.metric._extract_from_markdown(text)
         
         # 验证复杂表格被完整提取
-        self.assertIn('| 姓名 | 年龄 | 职业 | 薪资 |', result['table'])
-        self.assertIn('|:-----|:----:|-----:|------|', result['table'])
-        self.assertIn('| 张三 | 25   | 工程师 | 15k |', result['table'])
+        expected_table = """| 姓名 | 年龄 | 职业 | 薪资 |
+|:-----|:----:|-----:|------|
+| 张三 | 25   | 工程师 | 15k |
+| 李四 | 30   | 设计师 | 18k |
+| 王五 | 28   | 产品经理 | 20k |"""
+        self.assertIn(expected_table, result['table'])
         
         # 验证文本中表格被移除
         self.assertNotIn('| 姓名 | 年龄 | 职业 | 薪资 |', result['text'])
@@ -121,8 +126,10 @@ class TestTableExtraction(unittest.TestCase):
         result = self.metric._extract_from_markdown(text)
         
         # 验证对齐表格被提取
-        self.assertIn('| 左对齐 | 居中 | 右对齐 |', result['table'])
-        self.assertIn('|:-------|:----:|-------:|', result['table'])
+        expected_table = """| 左对齐 | 居中 | 右对齐 |
+|:-------|:----:|-------:|
+| 内容1  | 内容2 | 内容3  |"""
+        self.assertIn(expected_table, result['table'])
 
     def test_invalid_table_ignored(self):
         """测试无效表格被忽略"""
@@ -148,7 +155,10 @@ class TestTableExtraction(unittest.TestCase):
         result = self.metric._extract_from_markdown(text)
         
         # 验证包含转义管道的表格被提取
-        self.assertIn('| 列1 | 列2 \\| 列3 | 列4 |', result['table'])
+        expected_table = """| 列1 | 列2 \\| 列3 | 列4 |
+|-----|-----|-----|
+| 数据1 | 数据2 | 数据3 |"""
+        self.assertIn(expected_table, result['table'])
 
     def test_table_at_document_end(self):
         """测试文档末尾的表格"""
@@ -160,9 +170,10 @@ class TestTableExtraction(unittest.TestCase):
         result = self.metric._extract_from_markdown(text)
         
         # 验证文档末尾的表格被提取
-        self.assertIn('| 列1 | 列2 |', result['table'])
-        self.assertIn('|-----|-----|', result['table'])
-        self.assertIn('| 数据1 | 数据2 |', result['table'])
+        expected_table = """| 列1 | 列2 |
+|-----|-----|
+| 数据1 | 数据2 |"""
+        self.assertIn(expected_table, result['table'])
 
 
 
@@ -189,10 +200,11 @@ class TestTableExtraction(unittest.TestCase):
         result = self.metric._extract_from_markdown(text)
         
         # 验证复杂内容表格被提取
-        self.assertIn('| 列1 | 列2 | 列3 |', result['table'])
-        self.assertIn('包含**粗体**', result['table'])
-        self.assertIn('包含`代码`', result['table'])
-        self.assertIn('包含$公式$', result['table'])
+        expected_table = """| 列1 | 列2 | 列3 |
+|-----|-----|-----|
+| 包含**粗体** | 包含`代码` | 包含[链接](url) |
+| 包含*斜体* | 包含$公式$ | 包含>引用 |"""
+        self.assertIn(expected_table, result['table'])
 
     def test_nested_html_tables(self):
         """测试嵌套HTML表格"""
@@ -207,11 +219,20 @@ class TestTableExtraction(unittest.TestCase):
 </table>"""
 
         result = self.metric._extract_from_markdown(text)
-        
+        print("result['table']",result['table'])
         # 验证嵌套表格被完整提取
-        self.assertIn('<table>', result['table'])
-        self.assertIn('外层表格', result['table'])
-        self.assertIn('内层表格', result['table'])
+        expected_table = """<table>
+<tr><td>外层表格</td></tr>
+<tr><td>
+<table>
+<tr><td>内层表格</td></tr>
+</table>
+</td></tr>
+</table>
+<table>
+<tr><td>内层表格</td></tr>
+</table>"""
+        self.assertIn(expected_table, result['table'])
 
 
 if __name__ == '__main__':
