@@ -1014,15 +1014,6 @@ def demo_llm_webkit_with_preprocessed_html_evaluation():
     print(f"  - 跳过LLM推理: 是（直接处理预处理HTML）")
     print()
     
-    # 3. 性能对比：展示预处理HTML模式的优势
-    print("3. 性能优势演示...")
-    print("🚀 预处理HTML模式的优势:")
-    print("  ✅ 无需加载大型LLM模型（节省内存）")
-    print("  ✅ 跳过HTML简化推理步骤（节省时间）")
-    print("  ✅ 只需要基础的llm_web_kit依赖")
-    print("  ✅ 适合批量处理已预处理的数据")
-    print()
-    
     # 4. 运行评测
     print("4. 开始评测...")
     print("=" * 50)
@@ -1100,25 +1091,6 @@ def demo_llm_webkit_with_preprocessed_html_evaluation():
     print(f"✅ 详细结果已保存到: {results_path}")
     print(f"✅ CSV报告已保存到: {report_path}")
     
-    # 8. 使用建议
-    print(f"\n8. 💡 实际使用建议:")
-    print("=" * 50)
-    print("🔧 何时使用预处理HTML模式:")
-    print("  1. 已有LLM简化后的HTML数据")
-    print("  2. 需要批量处理大量数据")
-    print("  3. 部署环境内存有限")
-    print("  4. 对提取速度有较高要求")
-    print()
-    print("📝 数据准备要求:")
-    print("  1. 确保预处理HTML包含_item_id属性")
-    print("  2. 保持原始HTML作为备用")
-    print("  3. 验证预处理质量")
-    print()
-    print("⚙️  配置参数说明:")
-    print("  - use_preprocessed_html: True/False")
-    print("  - preprocessed_html_field: 字段名（默认'llm_webkit_html'）")
-    
-    print("\n✅ 预处理HTML功能演示完成！")
 
 
 if __name__ == "__main__":

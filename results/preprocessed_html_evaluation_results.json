@@ -2,32 +2,32 @@
   "metadata": {
     "dataset_name": "real_preprocessed_html_test",
     "extractor_name": "llm-webkit",
-    "timestamp": "2025-08-08T16:08:47.516977",
+    "timestamp": "2025-08-13T14:53:57.558572",
     "total_samples": 2
   },
   "overall_metrics": {
-    "text_edit": 0.5209619232317955,
+    "text_edit": 0.045309156685715835,
     "code_edit": 0.0,
     "table_edit": 0.0,
     "table_TEDS": 0.0,
     "formula_edit": 0.0,
-    "overall": 0.10419238464635909
+    "overall": 0.009061831337143167
   },
   "sample_results": [
     {
       "sample_id": "33e291cd-5b26-48b1-977f-3c63b45e6d13",
       "extraction_success": true,
-      "extraction_time": 1.0598080158233643,
+      "extraction_time": 0.6193361282348633,
       "metrics": {
         "code_edit": {
           "score": 0.0,
           "success": true,
           "details": {
-            "distance": 499,
-            "predicted_length": 499,
+            "distance": 505,
+            "predicted_length": 505,
             "groundtruth_length": 0,
             "normalized": true,
-            "predicted_code_length": 499,
+            "predicted_code_length": 505,
             "groundtruth_code_length": 0,
             "content_type": "code"
           }
@@ -43,57 +43,48 @@
           "error": "Both predicted and groundtruth are empty"
         },
         "text_edit": {
-          "score": 0.16059957173447537,
+          "score": 0.09025270758122739,
           "success": true,
           "details": {
-            "distance": 392,
-            "predicted_length": 467,
+            "distance": 252,
+            "predicted_length": 25,
             "groundtruth_length": 277,
             "normalized": true,
-            "predicted_text_length": 467,
+            "predicted_text_length": 25,
             "groundtruth_text_length": 277,
             "content_type": "text"
           }
         },
         "table_edit": {
           "score": 0.0,
-          "success": true,
+          "success": false,
           "details": {
-            "distance": 43,
-            "predicted_length": 43,
-            "groundtruth_length": 0,
-            "normalized": true,
-            "predicted_table_length": 43,
+            "predicted_table_length": 0,
             "groundtruth_table_length": 0,
             "content_type": "table"
-          }
+          },
+          "error": "Both predicted and groundtruth are empty"
         },
         "table_TEDS": {
           "score": 0.0,
-          "success": true,
+          "success": false,
           "details": {
-            "edit_distance": 4.0,
-            "predicted_nodes": 4,
-            "groundtruth_nodes": 3,
-            "max_nodes": 4,
-            "structure_only": false,
-            "algorithm": "TEDS",
-            "content_type": "table"
-          }
+            "content_type": "table",
+            "algorithm": "TEDS"
+          },
+          "error": "Skipped due to table_edit failure: unknown reason"
         },
         "overall": {
-          "score": 0.04014989293361884,
+          "score": 0.045126353790613694,
           "success": true,
           "details": {
             "source": "average_of_all_metrics",
             "description": "Overall score as average of all successful metrics",
-            "successful_metrics": 4,
-            "failed_metrics": 1,
+            "successful_metrics": 2,
+            "failed_metrics": 3,
             "individual_scores": {
               "code_edit": 0.0,
-              "text_edit": 0.16059957173447537,
-              "table_edit": 0.0,
-              "table_TEDS": 0.0
+              "text_edit": 0.09025270758122739
             }
           }
         }
@@ -109,7 +100,7 @@
     {
       "sample_id": "93898d00-0d6c-451d-9f99-4c386c6c2918",
       "extraction_success": true,
-      "extraction_time": 0.9913830757141113,
+      "extraction_time": 0.0010640621185302734,
       "metrics": {
         "code_edit": {
           "score": 0.0,
@@ -132,56 +123,47 @@
           "error": "Both predicted and groundtruth are empty"
         },
         "text_edit": {
-          "score": 0.8813242747291157,
+          "score": 0.00036560579020428197,
           "success": true,
           "details": {
-            "distance": 21730,
-            "predicted_length": 183104,
+            "distance": 161317,
+            "predicted_length": 59,
             "groundtruth_length": 161376,
             "normalized": true,
-            "predicted_text_length": 183104,
+            "predicted_text_length": 59,
             "groundtruth_text_length": 161376,
             "content_type": "text"
           }
         },
         "table_edit": {
           "score": 0.0,
-          "success": true,
+          "success": false,
           "details": {
-            "distance": 33,
-            "predicted_length": 33,
-            "groundtruth_length": 0,
-            "normalized": true,
-            "predicted_table_length": 33,
+            "predicted_table_length": 0,
             "groundtruth_table_length": 0,
             "content_type": "table"
-          }
+          },
+          "error": "Both predicted and groundtruth are empty"
         },
         "table_TEDS": {
           "score": 0.0,
-          "success": true,
+          "success": false,
           "details": {
-            "edit_distance": 8.0,
-            "predicted_nodes": 8,
-            "groundtruth_nodes": 3,
-            "max_nodes": 8,
-            "structure_only": false,
-            "algorithm": "TEDS",
-            "content_type": "table"
-          }
+            "content_type": "table",
+            "algorithm": "TEDS"
+          },
+          "error": "Skipped due to table_edit failure: unknown reason"
         },
         "overall": {
-          "score": 0.29377475824303856,
+          "score": 0.00036560579020428197,
           "success": true,
           "details": {
             "source": "average_of_all_metrics",
             "description": "Overall score as average of all successful metrics",
-            "successful_metrics": 3,
-            "failed_metrics": 2,
+            "successful_metrics": 1,
+            "failed_metrics": 4,
             "individual_scores": {
-              "text_edit": 0.8813242747291157,
-              "table_edit": 0.0,
-              "table_TEDS": 0.0
+              "text_edit": 0.00036560579020428197
             }
           }
         }
