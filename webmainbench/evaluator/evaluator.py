@@ -309,6 +309,9 @@ class Evaluator:
         """Evaluate a single sample."""
         if extractor.__class__.__name__ == 'TestModelExtractor':
             extraction_result = extractor.extract_from_sample(sample)
+        elif extractor.__class__.__name__ == 'LlmWebkitExtractor':
+            # LlmWebkitExtractor可以接受DataSample对象来支持预处理HTML
+            extraction_result = extractor.extract(sample, sample.url)
         else:
             # Extract content
             extraction_result = extractor.extract(sample.html, sample.url)
