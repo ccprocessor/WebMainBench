@@ -605,14 +605,50 @@ Output format should be a JSON-formatted string representing a dictionary where 
             print(f"❌ llm-webkit提取失败: {e}")
             print(f"❌ 错误详情: {traceback.format_exc()}")
             raise RuntimeError(f"llm-webkit提取失败: {str(e)}") from e
-    
-    
+
+
+    def extract(self, html_or_sample, url: str = None) -> ExtractionResult:
+        """
+        重写extract方法以支持预处理HTML模式
+        
+        Args:
+            html_or_sample: HTML字符串或DataSample对象
+            url: 可选的页面URL
+            
+        Returns:
+            ExtractionResult实例
+        """
+        # 判断输入类型
+        if type(html_or_sample).__name__ == 'DataSample':  # 这是一个DataSample对象
+            sample = html_or_sample
+            
+            # 检查是否使用预处理的HTML
+            if self.inference_config.use_preprocessed_html:
+                preprocessed_field = self.inference_config.preprocessed_html_field
+                
+                # 从sample中获取预处理的HTML内容
+                if hasattr(sample, preprocessed_field):
+                    preprocessed_html = getattr(sample, preprocessed_field)
+                    if preprocessed_html:
+                        print(f"📥 使用预处理HTML字段: {preprocessed_field}")
+                        return super().extract(preprocessed_html, sample.url)
+                    else:
+                        print(f"⚠️ 预处理HTML字段 {preprocessed_field} 为空，回退到原始HTML")
+                else:
+                    print(f"⚠️ 样本中缺少预处理HTML字段 {preprocessed_field}，回退到原始HTML")
+            
+            # 使用原始HTML
+            return super().extract(sample.html, sample.url)
+        else:
+            # 这是普通的HTML字符串，使用标准处理
+            return super().extract(html_or_sample, url)
+
     def _extract_content(self, html: str, url: str = None) -> ExtractionResult:
         """
         使用高级LLM推理提取内容.
         
         Args:
-            html: HTML内容或主HTML内容（如果配置了use_preprocessed_html）
+            html: HTML内容。如果配置了use_preprocessed_html=True，则由Evaluator传入预处理的HTML内容
             url: 可选的页面URL
             
         Returns:
@@ -623,7 +659,7 @@ Output format should be a JSON-formatted string representing a dictionary where 
         try:
             # 检查是否使用预处理的HTML（跳过HTML简化步骤）
             if self.inference_config.use_preprocessed_html:
-                # 直接使用传入的html作为main_html，调用_extract_content_from_main_html
+                # 传入的html已经是预处理的内容（由Evaluator从指定字段提取），直接用作main_html
                 print(f"📥 使用预处理HTML，跳过HTML简化步骤")
                 content, content_list = self._extract_content_from_main_html(html, url)
                 
