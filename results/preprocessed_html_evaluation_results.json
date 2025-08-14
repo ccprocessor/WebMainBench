@@ -2,22 +2,22 @@
   "metadata": {
     "dataset_name": "real_preprocessed_html_test",
     "extractor_name": "llm-webkit",
-    "timestamp": "2025-08-13T14:53:57.558572",
+    "timestamp": "2025-08-14T11:22:33.005587",
     "total_samples": 2
   },
   "overall_metrics": {
-    "text_edit": 0.045309156685715835,
+    "text_edit": 0.09025270758122739,
     "code_edit": 0.0,
     "table_edit": 0.0,
     "table_TEDS": 0.0,
     "formula_edit": 0.0,
-    "overall": 0.009061831337143167
+    "overall": 0.018050541516245477
   },
   "sample_results": [
     {
       "sample_id": "33e291cd-5b26-48b1-977f-3c63b45e6d13",
       "extraction_success": true,
-      "extraction_time": 0.6193361282348633,
+      "extraction_time": 0.6739089488983154,
       "metrics": {
         "code_edit": {
           "score": 0.0,
@@ -99,91 +99,26 @@
     },
     {
       "sample_id": "93898d00-0d6c-451d-9f99-4c386c6c2918",
-      "extraction_success": true,
-      "extraction_time": 0.0010640621185302734,
-      "metrics": {
-        "code_edit": {
-          "score": 0.0,
-          "success": false,
-          "details": {
-            "predicted_code_length": 0,
-            "groundtruth_code_length": 0,
-            "content_type": "code"
-          },
-          "error": "Both predicted and groundtruth are empty"
-        },
-        "formula_edit": {
-          "score": 0.0,
-          "success": false,
-          "details": {
-            "predicted_formula_length": 0,
-            "groundtruth_formula_length": 0,
-            "content_type": "formula"
-          },
-          "error": "Both predicted and groundtruth are empty"
-        },
-        "text_edit": {
-          "score": 0.00036560579020428197,
-          "success": true,
-          "details": {
-            "distance": 161317,
-            "predicted_length": 59,
-            "groundtruth_length": 161376,
-            "normalized": true,
-            "predicted_text_length": 59,
-            "groundtruth_text_length": 161376,
-            "content_type": "text"
-          }
-        },
-        "table_edit": {
-          "score": 0.0,
-          "success": false,
-          "details": {
-            "predicted_table_length": 0,
-            "groundtruth_table_length": 0,
-            "content_type": "table"
-          },
-          "error": "Both predicted and groundtruth are empty"
-        },
-        "table_TEDS": {
-          "score": 0.0,
-          "success": false,
-          "details": {
-            "content_type": "table",
-            "algorithm": "TEDS"
-          },
-          "error": "Skipped due to table_edit failure: unknown reason"
-        },
-        "overall": {
-          "score": 0.00036560579020428197,
-          "success": true,
-          "details": {
-            "source": "average_of_all_metrics",
-            "description": "Overall score as average of all successful metrics",
-            "successful_metrics": 1,
-            "failed_metrics": 4,
-            "individual_scores": {
-              "text_edit": 0.00036560579020428197
-            }
-          }
-        }
-      },
-      "sample_metadata": {
-        "url": "https://www.15shuba.net/html/58/58618/index.html",
-        "domain": null,
-        "language": "zh",
-        "content_type": null,
-        "difficulty": null
-      }
+      "extraction_success": false,
+      "extraction_time": 0.0,
+      "extraction_error": "Empty HTML input",
+      "metrics": {}
     }
   ],
   "category_metrics": null,
   "error_analysis": {
     "total_samples": 2,
-    "failed_count": 0,
-    "success_rate": 1.0,
-    "common_errors": {},
-    "sample_errors": []
+    "failed_count": 1,
+    "success_rate": 0.5,
+    "common_errors": {
+      "empty_input": 1
+    },
+    "sample_errors": [
+      {
+        "sample_id": "93898d00-0d6c-451d-9f99-4c386c6c2918",
+        "error": "Empty HTML input"
+      }
+    ]
   },
   "extractor_config": {
     "use_preprocessed_html": true,
