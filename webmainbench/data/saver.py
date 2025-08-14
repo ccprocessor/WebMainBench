@@ -239,6 +239,7 @@ class DataSaver:
             
             # Add extraction results if available
             extraction_result = extraction_map.get(sample.id)
+            from webmainbench.metrics.base import BaseMetric
             if extraction_result:
                 # Add extracted content with extractor name prefix
                 sample_dict[f'{extractor_name}_content'] = extraction_result.get('extracted_content', '')
@@ -251,7 +252,22 @@ class DataSaver:
                 for metric_name, metric_data in metrics.items():
                     if isinstance(metric_data, dict) and metric_data.get('success', False):
                         sample_dict[f'{extractor_name}_{metric_name}_score'] = metric_data.get('score', 0)
-            
+
+                # 解析预测值（predicted）
+                predicted_content = extraction_result.get('extracted_content', '')
+                predicted_parts = BaseMetric._extract_from_markdown(predicted_content)  # 关键：解析预测内容
+                for part_type in ['code', 'formula', 'table', 'text']:
+                    sample_dict[f'{extractor_name}_predicted_{part_type}'] = predicted_parts.get(part_type, '')
+
+                # 解析真实值（groundtruth）
+                groundtruth_content = sample_dict.get('groundtruth_content', '')
+                groundtruth_parts = BaseMetric._extract_from_markdown(groundtruth_content)  # 关键：解析真实内容
+                for part_type in ['code', 'formula', 'table', 'text']:
+                    sample_dict[f'{extractor_name}_groundtruth_{part_type}'] = groundtruth_parts.get(part_type,
+                                                                                                     '')
+
+
+
             enriched_samples.append(sample_dict)
         
         # Save as JSONL
