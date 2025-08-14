@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Dict, Any, List, Optional, Union
 import traceback
 import re
-
+from bs4 import BeautifulSoup
 
 @dataclass
 class MetricResult:
@@ -238,49 +238,65 @@ class BaseMetric(ABC):
                 extracted_segments.append(formula_full)
                 if formula_content.strip():
                     formula_parts.append(formula_content.strip())
-        
+
         # 提取表格
         table_parts = []
-        
-        # 1. 提取HTML表格
-        html_table_pattern = r'<table[^>]*>.*?</table>'
-        for match in re.finditer(html_table_pattern, text, re.DOTALL | re.IGNORECASE):
-            html_table = match.group(0)
+
+        # ===== 1. 提取 HTML 表格 =====
+        # 用 BeautifulSoup 替代正则，防止嵌套或匹配不全
+        soup = BeautifulSoup(text, "html.parser")
+        for table in soup.find_all("table"):
+            html_table = str(table)
             extracted_segments.append(html_table)
             table_parts.append(html_table)
-        
-        # 2. 提取Markdown表格
+
+        # ===== 2. 提取 Markdown 表格 =====
         lines = text.split('\n')
         table_lines = []
         in_markdown_table = False
-        
+        found_separator = False  # 是否已找到分隔行
+
+        def is_md_table_line(line):
+            """判断是否可能是 Markdown 表格行"""
+            if line.count("|") < 3:  # 至少三个竖线
+                return False
+            return True
+
+        def is_md_separator_line(line):
+            """判断是否为 Markdown 分隔行"""
+            parts = [p.strip() for p in line.split("|")]
+            # 检查是否所有部分都是分隔符格式
+            for p in parts:
+                if p and not re.match(r"^:?\-{3,}:?$", p):
+                    return False
+            return True
+
+        def save_table():
+            """保存当前表格并清空缓存"""
+            nonlocal table_lines
+            # 只有当表格行数大于等于2，且第二行是分隔行时才保存
+            if len(table_lines) >= 2 and is_md_separator_line(table_lines[1]):
+                md_table = '\n'.join(table_lines)
+                extracted_segments.append(md_table)
+                table_parts.append(md_table)
+
         for line in lines:
-            if '|' in line and line.strip():
+            if is_md_table_line(line):
                 table_lines.append(line)
                 in_markdown_table = True
-            elif in_markdown_table and line.strip() == '':
-                # Markdown表格结束（空行）
-                if table_lines:
-                    md_table = '\n'.join(table_lines)
-                    extracted_segments.append(md_table)
-                    table_parts.append(md_table)
+                if is_md_separator_line(line):
+                    found_separator = True
+            else:
+                if in_markdown_table:
+                    save_table()
                     table_lines = []
-                in_markdown_table = False
-            elif in_markdown_table:
-                # 表格内的非表格行，Markdown表格结束
-                if table_lines:
-                    md_table = '\n'.join(table_lines)
-                    extracted_segments.append(md_table)
-                    table_parts.append(md_table)
-                    table_lines = []
-                in_markdown_table = False
-        
-        # 处理文档末尾的Markdown表格
-        if table_lines:
-            md_table = '\n'.join(table_lines)
-            extracted_segments.append(md_table)
-            table_parts.append(md_table)
-        
+                    in_markdown_table = False
+                    found_separator = False
+
+        # 处理文档末尾的 Markdown 表格
+        if in_markdown_table:
+            save_table()
+
         # 提取剩余文本（移除所有已提取的内容片段）
         clean_text = text
         for segment in extracted_segments:
