@@ -623,22 +623,19 @@ Output format should be a JSON-formatted string representing a dictionary where 
             sample = html_or_sample
             
             # 检查是否使用预处理的HTML
-            if self.inference_config.use_preprocessed_html:
-                preprocessed_field = self.inference_config.preprocessed_html_field
-                
-                # 从sample中获取预处理的HTML内容
-                if hasattr(sample, preprocessed_field):
-                    preprocessed_html = getattr(sample, preprocessed_field)
-                    if preprocessed_html:
+            try:
+                if self.inference_config.use_preprocessed_html:
+                    preprocessed_field = self.inference_config.preprocessed_html_field
+                    
+                    # 从sample中获取预处理的HTML内容
+                    if hasattr(sample, preprocessed_field):
+                        preprocessed_html = getattr(sample, preprocessed_field)
                         print(f"📥 使用预处理HTML字段: {preprocessed_field}")
                         return super().extract(preprocessed_html, sample.url)
-                    else:
-                        print(f"⚠️ 预处理HTML字段 {preprocessed_field} 为空，回退到原始HTML")
-                else:
-                    print(f"⚠️ 样本中缺少预处理HTML字段 {preprocessed_field}，回退到原始HTML")
-            
-            # 使用原始HTML
-            return super().extract(sample.html, sample.url)
+            except Exception as e:
+                return ExtractionResult.create_error_result(
+                    f"访问预处理HTML字段 {preprocessed_field} 时发生异常: {str(e)}"
+                )
         else:
             # 这是普通的HTML字符串，使用标准处理
             return super().extract(html_or_sample, url)
