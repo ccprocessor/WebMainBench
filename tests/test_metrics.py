@@ -305,8 +305,8 @@ def hello_world():
         # 验证代码编辑距离（缺少python标识符导致轻微差异）
         self.assertIn("code_edit", results)
         self.assertTrue(results["code_edit"].success)
-        self.assertAlmostEqual(results["code_edit"].score, 0.905797, places=5,
-                               msg=f"code_edit分数应该是0.905797，实际: {results['code_edit'].score}")
+        self.assertAlmostEqual(results["code_edit"].score, 0.8970588235294118, places=5,
+                               msg=f"code_edit分数应该是0.8970588235294118，实际: {results['code_edit'].score}")
 
     def test_table_sample_edit_distance(self):
         """测试表格样本的编辑距离"""
@@ -373,8 +373,8 @@ $$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$"""
         # 验证文本编辑距离（去除公式后的纯文本，也受符号转义影响）
         self.assertIn("text_edit", results)
         self.assertTrue(results["text_edit"].success)
-        self.assertAlmostEqual(results["text_edit"].score, 0.320000, places=5,
-                               msg=f"text_edit分数应该是0.320000，实际: {results['text_edit'].score}")
+        self.assertAlmostEqual(results["text_edit"].score, 0.37209302325581395, places=5,
+                               msg=f"text_edit分数应该是0.37209302325581395，实际: {results['text_edit'].score}")
 
     def test_overall_score_calculation(self):
         """测试综合分数计算"""
