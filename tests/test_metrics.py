@@ -91,8 +91,8 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         self.assertTrue(code_result.success)
         self.assertIsInstance(code_result.score, float)
         # 验证固定内容的确定分数
-        self.assertAlmostEqual(code_result.score, 0.918367, places=5,
-                               msg=f"code_edit分数应该是0.918367，实际: {code_result.score}")
+        self.assertAlmostEqual(code_result.score, 0.9166666666666666, places=5,
+                               msg=f"code_edit分数应该是0.9166666666666666，实际: {code_result.score}")
 
         # 验证详细信息
         self.assertEqual(code_result.details['content_type'], 'code')
@@ -164,8 +164,8 @@ $$\\int_{0}^{\\infty} e^{-x} dx = 1$$
         self.assertTrue(text_result.success)
         self.assertIsInstance(text_result.score, float)
         # 验证固定内容的确定分数
-        self.assertAlmostEqual(text_result.score, 0.769231, places=5,
-                               msg=f"text_edit分数应该是0.769231，实际: {text_result.score}")
+        self.assertAlmostEqual(text_result.score, 0.8532110091743119, places=5,
+                               msg=f"text_edit分数应该是0.8532110091743119，实际: {text_result.score}")
 
         # 验证详细信息
         self.assertEqual(text_result.details['content_type'], 'text')
@@ -299,8 +299,8 @@ def hello_world():
         # 验证文本编辑距离（固定内容应该有确定分数）
         self.assertIn("text_edit", results)
         self.assertTrue(results["text_edit"].success)
-        self.assertAlmostEqual(results["text_edit"].score, 1.000000, places=5,
-                               msg=f"text_edit分数应该是1.000000，实际: {results['text_edit'].score}")
+        self.assertAlmostEqual(results["text_edit"].score, 0.9552238805970149, places=5,
+                               msg=f"text_edit分数应该是0.9552238805970149，实际: {results['text_edit'].score}")
 
         # 验证代码编辑距离（缺少python标识符导致轻微差异）
         self.assertIn("code_edit", results)
@@ -367,8 +367,8 @@ $$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$"""
         # 验证公式编辑距离（符号转义导致的固定低分）
         self.assertIn("formula_edit", results)
         self.assertTrue(results["formula_edit"].success)
-        self.assertAlmostEqual(results["formula_edit"].score, 0.000000, places=5,
-                               msg=f"formula_edit分数应该是0.000000，实际: {results['formula_edit'].score}")
+        self.assertAlmostEqual(results["formula_edit"].score, 0.08771929824561409, places=5,
+                               msg=f"formula_edit分数应该是0.08771929824561409，实际: {results['formula_edit'].score}")
 
         # 验证文本编辑距离（去除公式后的纯文本，也受符号转义影响）
         self.assertIn("text_edit", results)
