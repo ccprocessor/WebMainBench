@@ -203,19 +203,24 @@ class BaseMetric(ABC):
         extracted_segments = []
         code_parts = []
         # 同时匹配行内代码 `...` 和代码块 ```...```
-        pattern = r'(```[\s\S]*?```|`[^`\n]+`)'  # 匹配 ```...``` 或 `...`
+        pattern = r'(```[\s\S]*?```|`[^`\n]+`)'
         for match in re.finditer(pattern, text):
             code_segment = match.group(0)
+            extracted_segments.append(code_segment)
 
-            # 判断是代码块还是行内代码
             if code_segment.startswith('```'):
-                # 代码块，去掉 ``` 并去除首尾空白
-                code_content = code_segment[3:-3].strip()
+                # 处理代码块（保留内部缩进）
+                lines = code_segment.split('\n')
+                # 移除首尾的```标记
+                content_lines = lines[1:-1]
+                # 保留原始缩进，只拼接内容
+                code_content = '\n'.join(content_lines)
             else:
-                # 行内代码，去掉 `
-                code_content = code_segment[1:-1]
+                # 处理行内代码（只去除外层`和前后空格）
+                code_content = code_segment[1:-1].strip()
 
-            code_parts.append(code_content)
+            if code_content:  # 只添加非空内容
+                code_parts.append(code_content)
         
         # # 提取代码
         # code_parts = []
@@ -238,12 +243,18 @@ class BaseMetric(ABC):
         latex_patterns = [
             # r'(?<!\\)\$\$([^$]+)\$\$(?!\\)',  # Display math (not escaped)
             # r'(?<!\\)\$([^$\n]+)\$(?![\\\$])',  # Inline math (not escaped)
+            # r'\\begin\{equation\*?\}(.*?)\\end\{equation\*?\}',  # Equation environment
+            # r'\\begin\{align\*?\}(.*?)\\end\{align\*?\}',        # Align environment
+            # r'\\begin\{gather\*?\}(.*?)\\end\{gather\*?\}',      # Gather environment
+            # r'\\begin\{eqnarray\*?\}(.*?)\\end\{eqnarray\*?\}',  # Eqnarray environment
+            # r'\\begin\{multline\*?\}(.*?)\\end\{multline\*?\}',  # Multline environment
+            # r'\\begin\{split\}(.*?)\\end\{split\}',              # Split environment
             # r'(?<!\\)\$\$([^$]+)\$\$(?!\\)',
             # r'(?<!\\)\$([^$\n\w][^$\n]*[^$\n\w])\$(?![\\\$])',
-            r'\$\$(.*?)\$\$',  # 行间$$...$$
-            r'\\\[(.*?)\\]',  # 行间\[...\]
-            r'\$(.*?)\$',  # 行内$...$
-            r'\\\((.*?)\\\)',  # 行内\(...\)
+            r'(?<!\\)\$\$(.*?)(?<!\\)\$\$',  # 行间 $$...$$，确保 $ 没有被转义
+            r'(?<!\\)\\\[(.*?)(?<!\\)\\\]',  # 行间 \[...\]，确保 \ 没有被转义
+            r'(?<!\\)\$(.*?)(?<!\\)\$',  # 行内 $...$，确保 $ 没有被转义
+            r'(?<!\\)\\\((.*?)(?<!\\)\\\)',  # 行内 \(...\)，确保 \ 没有被转义
         ]
         
         for pattern in latex_patterns:
