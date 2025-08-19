@@ -9,3 +9,5 @@ resiliparse
 trafilatura
 # llm-web-kit==3.2.0
 https://github.com/opendatalab/magic-html/releases/download/magic_html-0.1.5-released/magic_html-0.1.5-py3-none-any.whl
+streamlit
+markdown
