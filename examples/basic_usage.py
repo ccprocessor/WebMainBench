@@ -957,7 +957,7 @@ def demo_llm_webkit_with_preprocessed_html_evaluation():
     print("1. 从真实数据集加载预处理HTML数据...")
     
     # 使用DataLoader加载真实的样本数据
-    dataset_path = Path("/home/lulindong/Pycharm_projects/cc/WebMainBench_1904_v1_WebMainBench_dataset_merge_with_llm_webkit.jsonl")
+    dataset_path = Path("/home/lulindong/Pycharm_projects/cc/WebMainBench_1848_v1_WebMainBench_dataset_merge_with_llm_webkit.jsonl")
     print(f"📂 数据集文件: {dataset_path}")
     
     if not dataset_path.exists():
@@ -1101,7 +1101,6 @@ if __name__ == "__main__":
         # demo_extractor_comparison()
         # demo_dataset_with_extraction()  # 演示保存带有抽取内容的数据集
         # demo_multi_extraction() # 演示多个抽取器同时评测
-        # demo_lld_workers_extraction()
         print("\n✅ 示例运行完成！")
         
     except Exception as e:

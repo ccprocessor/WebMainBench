@@ -201,34 +201,60 @@ class BaseMetric(ABC):
         
         # 收集所有需要移除的内容片段
         extracted_segments = []
-        
-        # 提取代码
         code_parts = []
-        # 代码块 ```code```
-        for match in re.finditer(r'```[\s\S]*?```', text):
-            code_block = match.group(0)
-            extracted_segments.append(code_block)
-            code_parts.append(code_block.strip('`').strip())
+        # 同时匹配行内代码 `...` 和代码块 ```...```
+        pattern = r'(```[\s\S]*?```|`[^`\n]+`)'
+        for match in re.finditer(pattern, text):
+            code_segment = match.group(0)
+            extracted_segments.append(code_segment)
+
+            if code_segment.startswith('```'):
+                # 处理代码块（保留内部缩进）
+                lines = code_segment.split('\n')
+                # 移除首尾的```标记
+                content_lines = lines[1:-1]
+                # 保留原始缩进，只拼接内容
+                code_content = '\n'.join(content_lines)
+            else:
+                # 处理行内代码（只去除外层`和前后空格）
+                code_content = code_segment[1:-1].strip()
+
+            if code_content:  # 只添加非空内容
+                code_parts.append(code_content)
         
-        # 行内代码 `code`
-        for match in re.finditer(r'`([^`]+)`', text):
-            inline_code_full = match.group(0)  # 包含反引号的完整匹配
-            inline_code_content = match.group(1)  # 只是内容
-            extracted_segments.append(inline_code_full)
-            code_parts.append(inline_code_content)
+        # # 提取代码
+        # code_parts = []
+        # # 代码块 ```code```
+        # for match in re.finditer(r'```[\s\S]*?```', text):
+        #     code_block = match.group(0)
+        #     extracted_segments.append(code_block)
+        #     code_parts.append(code_block.strip('`').strip())
+        #
+        # # 行内代码 `code`
+        # for match in re.finditer(r'`([^`]+)`', text):
+        #     inline_code_full = match.group(0)  # 包含反引号的完整匹配
+        #     inline_code_content = match.group(1)  # 只是内容
+        #     extracted_segments.append(inline_code_full)
+        #     code_parts.append(inline_code_content)
         
         # 提取公式
         formula_parts = []
         # 统一的公式提取模式
         latex_patterns = [
-            r'(?<!\\)\$\$([^$]+)\$\$(?!\\)',  # Display math (not escaped)
-            r'(?<!\\)\$([^$\n]+)\$(?![\\\$])',  # Inline math (not escaped)
+            # r'(?<!\\)\$\$([^$]+)\$\$(?!\\)',  # Display math (not escaped)
+            # r'(?<!\\)\$([^$\n]+)\$(?![\\\$])',  # Inline math (not escaped)
             # r'\\begin\{equation\*?\}(.*?)\\end\{equation\*?\}',  # Equation environment
             # r'\\begin\{align\*?\}(.*?)\\end\{align\*?\}',        # Align environment
             # r'\\begin\{gather\*?\}(.*?)\\end\{gather\*?\}',      # Gather environment
             # r'\\begin\{eqnarray\*?\}(.*?)\\end\{eqnarray\*?\}',  # Eqnarray environment
             # r'\\begin\{multline\*?\}(.*?)\\end\{multline\*?\}',  # Multline environment
             # r'\\begin\{split\}(.*?)\\end\{split\}',              # Split environment
+            # r'(?<!\\)\$\$([^$]+)\$\$(?!\\)',
+            # r'(?<!\\)\$([^$\n\w][^$\n]*[^$\n\w])\$(?![\\\$])',
+            r'(?<!\\)\$\$(.*?)(?<!\\)\$\$',  # 行间 $$...$$，确保 $ 没有被转义
+            r'(?<!\\)\\\[(.*?)(?<!\\)\\\]',  # 行间 \[...\]，确保 \ 没有被转义
+            r'(?<!\\)\$(.*?)(?<!\\)\$',  # 行内 $...$，确保 $ 没有被转义
+            r'(?<!\\)\\\((.*?)(?<!\\)\\\)',  # 行内 \(...\)，确保 \ 没有被转义
         ]
         
         for pattern in latex_patterns:
