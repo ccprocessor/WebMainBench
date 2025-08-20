@@ -589,12 +589,12 @@ Output format should be a JSON-formatted string representing a dictionary where 
         """使用llm-webkit的方法将main_html提取成content"""
         import traceback
         try:
-            from llm_web_kit.simple import extract_html_to_md
+            from llm_web_kit.simple import extract_content_from_main_html
             
             print(f"🔧 开始使用llm-webkit简单接口提取content...")
             
             # 使用简单接口提取markdown，传入URL
-            content = extract_html_to_md(url or "", main_html, clip_html=False)
+            content = extract_content_from_main_html(url or "", main_html)
             
             print(f"✅ llm-webkit提取完成: {len(content)}字符")
             
