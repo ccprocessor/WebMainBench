@@ -1,8 +1,7 @@
 '''
-This script is used to read the table data from the jsonl file and display it in a streamlit app.
-
-命令行输入：
-streamlit run WebMainBench/webmainbench/utils/Data_Modification_Tools.py -- WebMainBench/data/WebMainBench_test_0814_llm-webkit_filtered_table_results.jsonl
+本脚本用于从jsonl文件读取表格数据，并在streamlit应用中展示和编辑。
+命令行输入示例：
+streamlit run /home/zhangshuo/Desktop/vscodeworkspace/WebMainBench/tools/label_tool.py -- WebMainBench/data/WebMainBench_test_0814_llm-webkit_filtered_table_results.jsonl
 注意：-- 后面有个空格，否则会报错，然后再接数据文件路径
 
 '''
@@ -33,12 +32,18 @@ def load_data():
                 data.append(json.loads(line))
     return data
 
-# 保存所有数据
-def save_data(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        for item in data:
-            print(item)
-            f.write(json.dumps(item, ensure_ascii=False) + "\n")
+# 只更新单条数据，避免全文件重写
+def update_single_item(index, new_item):
+    lines = []
+    if not os.path.exists(DATA_FILE):
+        return
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    if 0 <= index < len(lines):
+        # 保证只替换对应行
+        lines[index] = json.dumps(new_item, ensure_ascii=False) + "\n"
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            f.writelines(lines)
 
 # Streamlit页面布局
 st.set_page_config(layout="wide")
@@ -58,30 +63,48 @@ col1, col2, col3 = st.columns([1.5, 1.5, 2])
 
 with col1:
     st.subheader("HTML 渲染")
-    st.markdown(
-        f'<div style="border:1px solid #ddd;padding:8px;overflow:auto;max-height:600px">{item.get("html","")}</div>',
-        unsafe_allow_html=True
-    )
+    # 尝试用st.components.v1.html增强HTML+CSS渲染能力
+    try:
+        st.components.v1.html(
+            f'<div style="border:1px solid #ddd;padding:8px;overflow:auto;max-height:600px">{item.get("html","")}</div>',
+            height=620,
+            scrolling=True,
+        )
+    except Exception as e:
+        st.markdown(
+            f'<div style="border:1px solid #ddd;padding:8px;overflow:auto;max-height:600px">{item.get("html","")}</div>',
+            unsafe_allow_html=True
+        )
+        st.info("st.components.v1.html不可用，已回退为st.markdown。")
 
 with col2:
     st.subheader("Markdown 渲染")
+    # 实时渲染 Markdown，优先显示编辑区内容
+    # 使用 session_state 保持编辑内容
+    if f"markdown_edit_{index}" not in st.session_state:
+        st.session_state[f"markdown_edit_{index}"] = item.get("groundtruth_content", "")
+    current_markdown = st.session_state[f"markdown_edit_{index}"]
     st.markdown(
-        item.get("groundtruth_content", ""),
+        current_markdown,
         unsafe_allow_html=True
     )
 
 with col3:
     st.subheader("Markdown 源代码（可编辑）")
+    # 实时更新 session_state
     new_markdown = st.text_area(
         "编辑 Markdown",
-        value=item.get("groundtruth_content", ""),
+        value=st.session_state.get(f"markdown_edit_{index}", item.get("groundtruth_content", "")),
         height=600,
         key=f"markdown_edit_{index}"
     )
+    # 提交按钮只用于保存到文件
     if st.button("提交更改", key=f"submit_{index}"):
         if new_markdown != item.get("groundtruth_content", ""):
+            # 只更新当前条目，避免全文件重写和数据覆盖
             data[index]["groundtruth_content"] = new_markdown
-            save_data(data)
+            update_single_item(index, data[index])
+            load_data.clear()  # 清理缓存，确保下次读取到最新数据
             st.success("更改已保存！")
         else:
             st.info("内容未更改，无需保存。")
